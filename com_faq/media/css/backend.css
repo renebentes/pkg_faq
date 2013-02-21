@@ -1,0 +1,12 @@
+/* toolbar */
+.icon-48-faqs, .icon-48-faq {
+	background: url(../images/toolbar/faq.png) no-repeat left;
+}
+
+.icon-48-cpanel {
+	background: url(../images/toolbar/cpanel.png) no-repeat left !important;
+}
+
+.icon-48-faq-categories {
+	background: url(../images/toolbar/category.png) no-repeat left;
+}
