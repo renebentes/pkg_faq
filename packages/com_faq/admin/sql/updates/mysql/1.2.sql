@@ -1,0 +1,1 @@
+ALTER TABLE `#__faq` CHANGE COLUMN `state` `published` tinyint(3) NOT NULL DEFAULT '0';

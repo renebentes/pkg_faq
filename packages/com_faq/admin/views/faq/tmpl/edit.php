@@ -9,6 +9,11 @@
 // No direct access.
 defined('_JEXEC') or die;
 
+// Get document
+$doc = JFactory::getDocument();
+$doc->setTitle(JText::_('COM_FAQ_FAQ_TITLE'));
+$doc->addStyleSheet(JURI::root() . 'media/com_faq/css/backend.css');
+
 // Include the component HTML helpers.
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 
@@ -44,8 +49,8 @@ $canDo = FaqHelper::getActions();
 				<?php echo $this->form->getInput('catid'); ?></li>
 
 				<?php if ($canDo->get('core.edit.state')): ?>
-					<li><?php echo $this->form->getLabel('state'); ?>
-					<?php echo $this->form->getInput('state'); ?></li>
+					<li><?php echo $this->form->getLabel('published'); ?>
+					<?php echo $this->form->getInput('published'); ?></li>
 				<?php endif; ?>
 
 				<li><?php echo $this->form->getLabel('access'); ?>

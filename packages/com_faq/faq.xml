@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 2 or later; see http://www.gnu.org/licenses/gpl-2.0.html</license>
 	<authorEmail>renebentes@makesoft.com.br</authorEmail>
 	<authorUrl>http://www.makesoft.com.br</authorUrl>
-	<version>1.0</version>
+	<version>1.2</version>
 	<description>COM_FAQ_XML_DESCRIPTION</description>
 	<scriptfile>script.php</scriptfile>
 	<install>
@@ -48,9 +48,9 @@
 	<administration>
 		<menu view="cpanel" img="../media/com_faq/images/menu/faq.png" link="option=com_faq" alt="Faq">com_faq</menu>
 		<submenu>
-			<menu view="cpanel" img="../media/com_faq/images/menu/cpanel.png" link="option=com_faq" alt="Faq/Cpanel">com_faq_cpanel</menu>
+			<menu view="cpanel" img="../media/com_faq/images/menu/faq_cpanel.png" link="option=com_faq" alt="Faq/Cpanel">com_faq_cpanel</menu>
 			<menu view="faqs" img="../media/com_faq/images/menu/faq.png" link="option=com_faq&amp;view=faqs" alt="Faq/Faqs">com_faq_faqs</menu>
-			<menu view="categories" img="../media/com_faq/images/menu/category.png" link="option=com_categories&amp;extension=com_faq" alt="FAQ/Categories">com_faq_categories</menu>
+			<menu view="categories" img="../media/com_faq/images/menu/faq_category.png" link="option=com_categories&amp;extension=com_faq" alt="FAQ/Categories">com_faq_categories</menu>
 		</submenu>
 		<files folder="admin">
 			<folder>controllers</folder>

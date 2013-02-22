@@ -30,6 +30,7 @@ class FaqTableFaq extends JTable
 	public function __construct(&$db)
 	{
 		parent::__construct('#__faq', 'id', $db);
+		$this->created = JFactory::getDate()->toSql();
 	}
 
 	/**
@@ -102,7 +103,7 @@ class FaqTableFaq extends JTable
 			$this->ordering = 0;
 		} elseif (empty($this->ordering)) {
 			// Set ordering to last if ordering was 0
-			$this->ordering = self::getNextOrder('state >= 0');
+			$this->ordering = self::getNextOrder($this->_db->quoteName('catid'). ' = ' . $this->_db->Quote($this->catid). ' AND published >= 0');
 		}
 
 		// Check the publish down date is not earlier than publish up.

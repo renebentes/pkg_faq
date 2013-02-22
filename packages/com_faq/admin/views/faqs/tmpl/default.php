@@ -9,6 +9,11 @@
 // No direct access.
 defined('_JEXEC') or die;
 
+// Get document
+$doc = JFactory::getDocument();
+$doc->setTitle(JText::_('COM_FAQ_FAQS_TITLE'));
+$doc->addStyleSheet(JURI::root() . 'media/com_faq/css/backend.css');
+
 // Include the component HTML helpers.
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 
@@ -62,7 +67,7 @@ $saveOrder = $listOrder == 'a.ordering';
 					<?php echo JHtml::_('grid.sort', 'COM_FAQ_HEADING_TITLE', 'a.title', $listDirn, $listOrder); ?>
 				</th>
 				<th class="nowrap" width="5%">
-					<?php echo JHtml::_('grid.sort', 'JSTATUS', 'a.state', $listDirn, $listOrder); ?>
+					<?php echo JHtml::_('grid.sort', 'JSTATUS', 'a.publishe', $listDirn, $listOrder); ?>
 				</th>
 				<th class="nowrap" width="10%">
 					<?php echo JHtml::_('grid.sort', 'JCATEGORY', 'category_title', $listDirn, $listOrder); ?>

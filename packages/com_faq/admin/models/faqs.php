@@ -38,7 +38,7 @@ class FaqModelFaqs extends JModelList
 				'title', 'a.title',
 				'alias', 'a.alias',
 				'featured', 'a.featured',
-				'state', 'a.state',
+				'published', 'a.published',
 				'catid', 'a.catid', 'category_title',
 				'ordering', 'a.ordering',
 				'access', 'a.access', 'access_level',
@@ -142,7 +142,7 @@ class FaqModelFaqs extends JModelList
 			$this->getState(
 				'list.select',
 				'a.id, a.catid, a.title, a.alias, a.ordering, ' .
-				'a.state, a.access, a.language, a.checked_out, ' .
+				'a.published, a.access, a.language, a.checked_out, ' .
 				'a.checked_out_time, a.publish_up, a.publish_down'
 			)
 		);
@@ -181,11 +181,11 @@ class FaqModelFaqs extends JModelList
 		$published = $this->getState('filter.published');
 		if (is_numeric($published))
 		{
-			$query->where('a.state = ' . (int) $published);
+			$query->where('a.published = ' . (int) $published);
 		}
 		elseif ($published === '')
 		{
-			$query->where('(a.state = 0 OR a.state = 1)');
+			$query->where('(a.published = 0 OR a.published = 1)');
 		}
 
 		// Filter by a single or group of categories.

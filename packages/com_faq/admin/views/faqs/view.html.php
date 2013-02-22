@@ -49,14 +49,6 @@ class FaqViewfaqs extends JView
 			return false;
 		}
 
-		// Get document
-		$doc = JFactory::getDocument();
-		$doc->setTitle(JText::_('COM_FAQ_FAQS_TITLE'));
-		$doc->addStyleSheet(JURI::root() . 'media/com_faq/css/backend.css');
-
-		// Include the component HTML helpers.
-		JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
-
 		$this->addToolbar();
 
 		parent::display($tpl);

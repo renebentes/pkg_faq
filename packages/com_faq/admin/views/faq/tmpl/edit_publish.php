@@ -10,6 +10,7 @@
 defined('_JEXEC') or die;
 
 $fieldSets = $this->form->getFieldsets('publish');
+var_dump($fieldSets);
 foreach ($fieldSets as $name => $fieldSet):
 	echo JHtml::_('sliders.panel', JText::_($fieldSet->label), $name . '-publish');
 	if (isset($fieldSet->description) && trim($fieldSet->description)):

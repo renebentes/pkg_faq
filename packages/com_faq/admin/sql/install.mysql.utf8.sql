@@ -28,3 +28,5 @@ CREATE TABLE IF NOT EXISTS `#__faq` (
   `xreference` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+ALTER TABLE `#__faq` CHANGE COLUMN `state` `published` tinyint(3) NOT NULL DEFAULT '0';

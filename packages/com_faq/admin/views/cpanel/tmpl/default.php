@@ -8,8 +8,16 @@
 
 // No direct access.
 defined('_JEXEC') or die;
-?>
 
+// Get document
+$doc = JFactory::getDocument();
+$doc->setTitle(JText::_('COM_FAQ_CPANEL_TITLE'));
+$doc->addStyleSheet(JURI::root() . 'media/com_faq/css/backend.css');
+
+// Include the component HTML helpers.
+JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
+
+?>
 <div class="adminform">
 	<div class="cpanel-left">
 		<div id="cpanel">
@@ -17,5 +25,8 @@ defined('_JEXEC') or die;
 			<?php echo FaqHelper::button('faqs', 'faq.png', JText::_('COM_FAQ_QUICKICON_FAQS')); ?>
 			<?php echo FaqHelper::button('categories', 'category.png', JText::_('COM_FAQ_QUICKICON_CATEGORIES')); ?>
 		</div>
+	</div>
+	<div class="cpanel-right">
+		<?php echo $this->loadTemplate('stats'); ?>
 	</div>
 </div>

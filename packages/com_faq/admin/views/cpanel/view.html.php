@@ -20,6 +20,8 @@ jimport('joomla.application.component.view');
  */
 class FaqViewCpanel extends JView
 {
+	protected $items;
+
 	/**
 	 * Method to display the view.
 	 *
@@ -31,20 +33,15 @@ class FaqViewCpanel extends JView
 	 */
 	public function display($tpl = null)
 	{
+		// Initialise variables.
+		$this->items = $this->get('Items');
+
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
 			JError::raiseError(500, implode("\n", $errors));
 			return false;
 		}
-
-		// Get document
-		$doc = JFactory::getDocument();
-		$doc->setTitle(JText::_('COM_FAQ_CPANEL_TITLE'));
-		$doc->addStyleSheet(JURI::root() . 'media/com_faq/css/backend.css');
-
-		// Include the component HTML helpers.
-		JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 
 		$this->addToolbar();
 
