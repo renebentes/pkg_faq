@@ -34,7 +34,13 @@ class FaqViewCpanel extends JView
 	public function display($tpl = null)
 	{
 		// Initialise variables.
-		$this->items = $this->get('Items');
+		$model = JModel::getInstance('Faqs', 'FaqModel', array('ignore_request' => true));
+		$model->setState('list.select', 'a.id, a.title, a.created, a.hits');
+		$model->setState('list.limit', 5);
+		$model->setState('list.ordering', 'a.hits');
+		$model->setState('list.direction', 'desc');
+
+		$this->items = $model->getItems();
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))

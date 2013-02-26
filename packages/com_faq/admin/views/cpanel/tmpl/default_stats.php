@@ -13,9 +13,6 @@ defined('_JEXEC') or die;
 
 <?php echo JHtml::_('sliders.start', 'stat-pane'); ?>
 <?php echo JHtml::_('sliders.panel', JText::_('COM_FAQ_FIELDSET_FAQS'), 'faqs-panel'); ?>
-<pre>
-	<?php var_dump($this); ?>
-</pre>
 <table class="adminlist">
 	<thead>
 		<tr>
@@ -53,10 +50,10 @@ defined('_JEXEC') or die;
 				<?php echo $this->escape($item->id); ?>
 			</td>
 			<td>
-				<a href="<?php echo $link; ?>"><?php echo $this->escape($item->name); ?></a>
+				<a href="<?php echo $link; ?>"><?php echo $this->escape($item->title); ?></a>
 			</td>
 			<td class="center">
-				<?php echo JHtml::_('date', $item->created, JText::_('DATE_FORMAT_LC4')); ?>
+				<?php echo JHtml::_('date', $item->created, JText::_('DATE_FORMAT_MK')); ?>
 			</td>
 			<td class="center nowrap">
 				<?php echo $this->escape($item->hits); ?>
