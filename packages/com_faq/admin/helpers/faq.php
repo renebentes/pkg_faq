@@ -34,7 +34,8 @@ class FaqHelper
 		JSubMenuHelper::addEntry(
 			JText::_('COM_FAQ_SUBMENU_CPANEL'),
 			'index.php?option=com_faq&view=cpanel',
-			$vName == 'cpanel');
+			$vName == 'cpanel'
+		);
 		JSubMenuHelper::addEntry(
 			JText::_('COM_FAQ_SUBMENU_FAQS'),
 			'index.php?option=com_faq&view=faqs',
