@@ -9,9 +9,9 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-$fieldSets = $this->form->getFieldsets('metadata');
-foreach ($fieldSets as $name => $fieldSet):
-	if ($name == 'jmetadata') :
+foreach ($this->form->getFieldsets('metadata') as $name => $fieldSet):
+	$element = $this->form->getFieldset($name);
+	if ($name == 'jmetadata' && !empty($element)) :
 		echo JHtml::_('sliders.panel', JText::_($fieldSet->label), $name . '-options');
 		if (isset($fieldSet->description) && trim($fieldSet->description)):
 			echo '<p class="tip">' . $this->escape(JText::_($fieldSet->description)) . '</p>';
@@ -19,7 +19,7 @@ foreach ($fieldSets as $name => $fieldSet):
 		?>
 		<fieldset class="panelform">
 			<ul class="adminformlist">
-			<?php foreach ($this->form->getFieldset($name) as $field): ?>
+			<?php foreach ($element as $field): ?>
 				<li><?php echo $field->label; ?>
 				<?php echo $field->input; ?></li>
 			<?php endforeach; ?>

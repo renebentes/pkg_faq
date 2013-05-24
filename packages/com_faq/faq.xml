@@ -5,8 +5,8 @@
 	<creationDate>20/02/2013</creationDate>
 	<copyright>(C) 2013 Makesoft, Inc. All rights reserved.</copyright>
 	<license>GNU General Public License version 2 or later; see http://www.gnu.org/licenses/gpl-2.0.html</license>
-	<authorEmail>renebentes@makesoft.com.br</authorEmail>
-	<authorUrl>http://www.makesoft.com.br</authorUrl>
+	<authorEmail>renebentes@yahoo.com.br</authorEmail>
+	<authorUrl></authorUrl>
 	<version>1.3</version>
 	<description>COM_FAQ_XML_DESCRIPTION</description>
 	<scriptfile>script.php</scriptfile>
@@ -46,11 +46,11 @@
 		<filename>index.html</filename>
 	</media>
 	<administration>
-		<menu view="cpanel" img="../media/com_faq/images/menu/faq.png" link="option=com_faq" alt="Faq">com_faq</menu>
+		<menu view="cpanel" img="../media/com_faq/images/menu/faq.png" link="option=com_faq" alt="FAQ">com_faq</menu>
 		<submenu>
-			<menu view="cpanel" img="../media/com_faq/images/menu/faq_cpanel.png" link="option=com_faq" alt="Faq/Cpanel">com_faq_cpanel</menu>
-			<menu view="faqs" img="../media/com_faq/images/menu/faq.png" link="option=com_faq&amp;view=faqs" alt="Faq/Faqs">com_faq_faqs</menu>
-			<menu view="categories" img="../media/com_faq/images/menu/faq_category.png" link="option=com_categories&amp;extension=com_faq" alt="FAQ/Categories">com_faq_categories</menu>
+			<menu view="cpanel" img="../media/com_faq/images/menu/faq-cpanel.png" link="option=com_faq" alt="FAQ/Cpanel">com_faq_cpanel</menu>
+			<menu view="faqs" img="../media/com_faq/images/menu/faq.png" link="option=com_faq&amp;view=faqs" alt="FAQ/FAQs">com_faq_faqs</menu>
+			<menu view="categories" img="../media/com_faq/images/menu/faq-category.png" link="option=com_categories&amp;extension=com_faq" alt="FAQ/Categories">com_faq_categories</menu>
 		</submenu>
 		<files folder="admin">
 			<folder>controllers</folder>
