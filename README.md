@@ -20,7 +20,7 @@ You can [report a bug or request a feature here](http://github.com/renebentes/pk
 
 TODO
 ----
-*Frontend
+* Frontend
 
 Release Notes
 -------------
