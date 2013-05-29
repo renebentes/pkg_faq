@@ -3,4 +3,56 @@
 	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
 		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" class="inputbox" filter="rules" validate="rules" component="com_faq" section="component" />
 	</fieldset>
+
+	<fieldset name="category" label="JCATEGORY" description="COM_FAQ_CATEGORY_SETTINGS_DESC">
+		<field name="show_category_title" type="radio" label="JGLOBAL_SHOW_CATEGORY_TITLE" description="JGLOBAL_SHOW_CATEGORY_TITLE_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="show_category_heading_title_text" type="radio"	label="JGLOBAL_SHOW_CATEGORY_HEADING_TITLE_TEXT_LABEL" description="JGLOBAL_SHOW_CATEGORY_HEADING_TITLE_TEXT_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="show_description" type="radio" label="JGLOBAL_SHOW_CATEGORY_DESCRIPTION_LABEL" description="JGLOBAL_SHOW_CATEGORY_DESCRIPTION_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="show_description_image" type="radio" label="JGLOBAL_SHOW_CATEGORY_IMAGE_LABEL" description="JGLOBAL_SHOW_CATEGORY_IMAGE_DESC" default="0">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="maxLevel" type="list" label="JGLOBAL_MAXIMUM_CATEGORY_LEVELS_LABEL" description="JGLOBAL_MAXIMUM_CATEGORY_LEVELS_DESC" default="-1">
+			<option value="0">JNONE</option>
+			<option value="-1">JALL</option>
+			<option value="1">J1</option>
+			<option value="2">J2</option>
+			<option value="3">J3</option>
+			<option value="4">J4</option>
+			<option value="5">J5</option>
+		</field>
+
+		<field name="show_empty_categories" type="radio" label="JGLOBAL_SHOW_EMPTY_CATEGORIES_LABEL" description="JGLOBAL_SHOW_EMPTY_CATEGORIES_DESC" default="0">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="show_no_results" type="radio" label="COM_FAQ_NO_RESULTS_LABEL" description="COM_FAQ_NO_RESULTS_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="show_subcat_desc" type="radio" label="JGLOBAL_SHOW_SUBCATEGORIES_DESCRIPTION_LABEL" description="JGLOBAL_SHOW_SUBCATEGORIES_DESCRIPTION_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="show_cat_num_items" type="radio" label="COM_FAQ_NUMBER_CATEGORY_ITEMS_LABEL" description="COM_FAQ_NUMBER_CATEGORY_ITEMS_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+	</fieldset>
 </config>

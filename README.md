@@ -20,7 +20,7 @@ You can [report a bug or request a feature here](http://github.com/renebentes/pk
 
 TODO
 ----
-*Frontend
+*Visualizações no frontend
 
 Release Notes
 -------------
@@ -34,9 +34,12 @@ Release Notes
 	! Relevant Message
 
 ######1.3
+	+ Script de instalação com tratamento de erros e remoção de arquivos desnecessários
+	+ Visualização no frontend para lista de FAQs por categoria
 	- Campos desnecessários no banco de dados
 ######1.2
-	^ Modificação de campo state para published
+	^ Campo state para published
+	- Opção de preferências na view faqs
 	+ Inclusão de View cpanel no backend para visualização geral de funcionalidades
 ######1.1
 	+ Primeira compilação com funcionalidades básicas (CRUD apenas no backend)

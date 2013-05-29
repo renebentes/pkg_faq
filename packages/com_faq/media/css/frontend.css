@@ -1,0 +1,8 @@
+/* Bootstrap Rewrite*/
+.accordion-heading {
+	text-align: justify;
+}
+.accordion-heading > a:hover,
+.accordion-heading > a:focus {
+	text-decoration: none;
+}
