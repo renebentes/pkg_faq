@@ -20,7 +20,11 @@ You can [report a bug or request a feature here](http://github.com/renebentes/pk
 
 TODO
 ----
+<<<<<<< HEAD
 *Visualizações no frontend
+=======
+* Frontend
+>>>>>>> 5c0382c2b3c300e9220c5417b20620450121dae9
 
 Release Notes
 -------------
