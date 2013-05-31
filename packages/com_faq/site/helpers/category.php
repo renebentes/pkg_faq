@@ -36,7 +36,6 @@ class FaqCategories extends JCategories
 		$options['table'] = '#__faq';
 		$options['extension'] = 'com_faq';
 		$options['statefield'] = 'published';
-		$options['countItems'] = 1;
 
 		parent::__construct($options);
 	}

@@ -55,4 +55,30 @@
 			<option value="1">JSHOW</option>
 		</field>
 	</fieldset>
+
+	<fieldset name="list_paramenters" label="JGLOBAL_LIST_LAYOUT_OPTIONS" description="COM_FAQ_LIST_SETTINGS_DESC">
+
+		<field name="display_num" type="list" label="COM_FAQ_NUMBER_ITEMS_LIST_LABEL" description="COM_FAQ_NUMBER_ITEMS_LIST_DESC" default="20">
+			<option value="5">J5</option>
+			<option value="10">J10</option>
+			<option value="15">J15</option>
+			<option value="20">J20</option>
+			<option value="25">J25</option>
+			<option value="30">J30</option>
+			<option value="50">J50</option>
+			<option value="100">J100</option>
+			<option value="0">JALL</option>
+		</field>
+
+		<field name="show_pagination" type="radio" label="JGLOBAL_PAGINATION_LABEL" description="JGLOBAL_PAGINATION_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+			<option value="2">JGLOBAL_AUTO</option>
+		</field>
+
+		<field name="show_pagination_results" type="radio" label="JGLOBAL_PAGINATION_RESULTS_LABEL" description="JGLOBAL_PAGINATION_RESULTS_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+	</fieldset>
 </config>

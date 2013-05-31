@@ -14,9 +14,6 @@ $doc = JFactory::getDocument();
 $doc->addStyleSheet(JURI::root() . 'media/com_faq/css/frontend.css');
 
 ?>
-<?php if (empty($this->items) && $this->params->get('show_no_results', 1)) : ?>
-<p><?php echo JText::_('COM_SERVICE_NO_RESULTS'); ?></p>
-<?php else : ?>
 <section class="category-list<?php echo $this->pageclass_sfx; ?>">
 	<?php if ($this->params->get('show_page_heading') || $this->params->get('show_category_title', 1) || $this->params->get('page_subheading')) : ?>
 		<div class="page-header">
@@ -54,35 +51,15 @@ $doc->addStyleSheet(JURI::root() . 'media/com_faq/css/frontend.css');
 	</div>
 	<?php endif; ?>
 
-	<div class="accordion" id="accordion2">
-		<?php
-		$x = 1;
-		foreach ($this->items as $item) : ?>
-		<div class="accordion-group">
-			<div class="accordion-heading">
-				<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse<?php echo $item->id; ?>" >
-					<i class="icon-question-sign"></i>
-					<?php echo $this->escape($item->title); ?>
-				</a>
-			</div>
-			<div id="collapse<?php echo $item->id; ?>" class="accordion-body collapse<?php echo $x == 1 ? ' in' : ''; ?>">
-				<div class="accordion-inner">
-					<?php echo JHtml::_('content.prepare', $item->description); ?>
-				</div>
-			</div>
-		</div>
-		<?php
-		$x++;
-		endforeach; ?>
-	</div>
+	<?php echo $this->loadTemplate('items'); ?>
 
-	<?php if ($this->params->def('show_pagination', 2) == 1  || ($this->params->get('show_pagination') == 2 && $this->pagination->get('pages.total') > 1)) : ?>
-	<nav class="pagination pagination-centered">
-		<?php echo $this->pagination->getPagesLinks(); ?>
-		<?php if ($this->params->def('show_pagination_results', 1)) : ?>
-		<p class="counter muted"><?php echo $this->pagination->getPagesCounter(); ?></p>
+	<?php if (!empty($this->children[$this->category->id]) && $this->maxLevel != 0) : ?>
+	<div class="cat-children">
+		<?php if ($this->params->get('show_category_heading_title_text', 1) == 1) : ?>
+		<h3><?php echo JTEXT::_('JGLOBAL_SUBCATEGORIES'); ?></h3>
 		<?php endif; ?>
-	</nav>
+		<?php echo $this->loadTemplate('children'); ?>
+	</div>
 	<?php endif; ?>
+
 </section>
-<?php endif; ?>

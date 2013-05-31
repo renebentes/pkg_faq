@@ -102,11 +102,66 @@ class FaqModelCategory extends JModelList
 	protected function populateState($ordering = null, $direction = null)
 	{
 		// Initialise variables.
-		$app	= JFactory::getApplication();
-		$params	= JComponentHelper::getParams('com_faq');
+		$app	= JFactory::getApplication('site');
+		$pk		= JRequest::getInt('id');
+
+		$this->setState('category.id', $pk);
+
+		// Load the parameters. Merge Global and Menu Item params into new object
+		$params = $app->getParams();
+		$menuParams = new JRegistry;
+
+		if ($menu = $app->getMenu()->getActive()) {
+			$menuParams->loadString($menu->params);
+		}
+
+		$mergedParams = clone $menuParams;
+		$mergedParams->merge($params);
+
+		$this->setState('params', $mergedParams);
+
+		// Get the user object.
+		$user = JFactory::getUser();
+
+		// Create a new query object.
+		$db		= $this->getDbo();
+		$query	= $db->getQuery(true);
+		$groups	= implode(',', $user->getAuthorisedViewLevels());
+
+		if ((!$user->authorise('core.edit.state', 'com_faq')) &&  (!$user->authorise('core.edit', 'com_faq')))
+		{
+			// Limit to published for people who can't edit or edit.state.
+			$this->setState('filter.published',	1);
+
+			// Filter by start and end dates.
+			$nullDate = $db->Quote($db->getNullDate());
+			$nowDate = $db->Quote(JFactory::getDate()->toSQL());
+
+			$query->where('(a.publish_up = ' . $nullDate . ' OR a.publish_up <= ' . $nowDate . ')');
+			$query->where('(a.publish_down = ' . $nullDate . ' OR a.publish_down >= ' . $nowDate . ')');
+		}
+		else
+		{
+			$this->setState('filter.published', array(0, 1, 2));
+		}
+
+		// filter.order
+		$itemid = JRequest::getInt('id', 0) . ':' . JRequest::getInt('Itemid', 0);
+		$orderCol = $app->getUserStateFromRequest('com_faq.category.list.' . $itemid . '.filter_order', 'filter_order', '', 'string');
+		if (!in_array($orderCol, $this->filter_fields)) {
+			$orderCol = 'a.ordering';
+		}
+		$this->setState('list.ordering', $orderCol);
+
+		$listOrder = $app->getUserStateFromRequest('com_faq.category.list.' . $itemid . '.filter_order_Dir',
+			'filter_order_Dir', '', 'cmd');
+		if (!in_array(strtoupper($listOrder), array('ASC', 'DESC', ''))) {
+			$listOrder = 'ASC';
+		}
+		$this->setState('list.direction', $listOrder);
 
 		// List state information
-		$limit = $app->getUserStateFromRequest('global.list.limit', 'limit', $app->getCfg('list_limit'), 'uint');
+		/*$limit = $app->getUserStateFromRequest('global.list.limit', 'limit', $app->getCfg('list_limit'), 'uint');
 		$this->setState('list.limit', $limit);
 
 		$limitstart = JRequest::getUInt('limitstart', 0);
@@ -128,27 +183,21 @@ class FaqModelCategory extends JModelList
 			$listOrder = 'ASC';
 		}
 
-		$this->setState('list.direction', $listOrder);
+		$this->setState('list.direction', $listOrder);*/
 
-		$id = JRequest::getVar('id', 0, '', 'int');
-		$this->setState('category.id', $id);
+		$this->setState('list.start', JRequest::getUInt('limitstart', 0));
+		$limit = $app->getUserStateFromRequest('com_faq.category.list.' . $itemid . '.limit', 'limit', $params->get('display_num'), 'uint');
+		$this->setState('list.limit', $limit);
 
-		// Get the user object.
-		$user = JFactory::getUser();
+		// set the depth of the category query based on parameter. On view Categories
+		$showSubcategories = $params->get('show_subcategory_content', '0');
 
-		if ((!$user->authorise('core.edit.state', 'category')) &&  (!$user->authorise('core.edit', 'category')))
-		{
-			// Limit to published for people who can't edit or edit.state.
-			$this->setState('filter.published',	1);
-
-			// Filter by start and end dates.
-			$this->setState('filter.publish_date', true);
+		if ($showSubcategories) {
+			$this->setState('filter.max_category_levels', $params->get('show_subcategory_content', '1'));
+			$this->setState('filter.subcategories', true);
 		}
 
 		$this->setState('filter.language', $app->getLanguageFilter());
-
-		// Load the parameters.
-		$this->setState('params', $params);
 	}
 
 	/**
@@ -160,82 +209,96 @@ class FaqModelCategory extends JModelList
 	 */
 	public function getItems()
 	{
-		// Invoke the parent getItems method to get the main list
-		$items = parent::getItems();
+		$params = $this->getState()->get('params');
+		$limit = $this->getState('list.limit');
 
-		// Convert the params field into an object, saving original in _params
-		for ($i = 0, $n = count($items); $i < $n; $i++)
+		if($this->_records === null && $category = $this->getCategory())
 		{
-			$item = &$items[$i];
-			if (!isset($this->_params))
+			$model = JModelLegacy::getInstance('Faqs', 'FaqModel', array('ignore_request' => true));
+			$model->setState('params', JFactory::getApplication()->getParams());
+			$model->setState('filter.category_id', $category->id);
+			$model->setState('filter.published', $this->getState('filter.published'));
+			$model->setState('filter.access', $this->getState('filter.access'));
+			$model->setState('filter.language', $this->getState('filter.language'));
+			$model->setState('list.ordering', $this->_buildContentOrderBy());
+			$model->setState('list.start', $this->getState('list.start'));
+			$model->setState('list.limit', $limit);
+			$model->setState('list.direction', $this->getState('list.direction'));
+			$model->setState('list.filter', $this->getState('list.filter'));
+			// filter.subcategories indicates whether to include records from subcategories
+			$model->setState('filter.subcategories', $this->getState('filter.subcategories'));
+			$model->setState('filter.max_category_levels', $this->setState('filter.max_category_levels'));
+			$model->setState('list.links', $this->getState('list.links'));
+
+			if ($limit >= 0)
 			{
-				$params = new JRegistry;
-				$item->params = $params;
-				$params->loadString($item->params);
+				$this->_records = $model->getItems();
+
+				if ($this->_records === false)
+				{
+					$this->setError($model->getError());
+				}
 			}
+			else
+			{
+				$this->_records = array();
+			}
+
+			$this->_pagination = $model->getPagination();
 		}
 
-		return $items;
+		return $this->_records;
 	}
 
 	/**
-	 * Method to build an SQL query to load the list data.
+	 * Build the orderby for the query
 	 *
-	 * @return  string  An SQL query
+	 * @return	string	$orderby portion of query
+	 * @since	2.5
+	 */
+	protected function _buildContentOrderBy()
+	{
+		$app		= JFactory::getApplication('site');
+		$db			= $this->getDbo();
+		$params		= $this->state->params;
+		$itemid		= JRequest::getInt('id', 0) . ':' . JRequest::getInt('Itemid', 0);
+		$orderCol	= $app->getUserStateFromRequest('com_faq.category.list.' . $itemid . '.filter_order', 'filter_order', '', 'string');
+		$orderDirn	= $app->getUserStateFromRequest('com_faq.category.list.' . $itemid . '.filter_order_Dir', 'filter_order_Dir', '', 'cmd');
+		$orderby	= ' ';
+
+		if (!in_array($orderCol, $this->filter_fields)) {
+			$orderCol = null;
+		}
+
+		if (!in_array(strtoupper($orderDirn), array('ASC', 'DESC', ''))) {
+			$orderDirn = 'ASC';
+		}
+
+		if ($orderCol && $orderDirn) {
+			$orderby .= $db->escape($orderCol) . ' ' . $db->escape($orderDirn) . ', ';
+		}
+
+		$orderby .= ' a.created, a.ordering';
+
+		return $orderby;
+	}
+
+	/**
+	 * Method to get a JPagination object for the data set.
+	 *
+	 * @return  JPagination  A JPagination object for the data set.
 	 *
 	 * @since   2.5
 	 */
-	protected function getListQuery()
+	function getPagination()
 	{
-		$user	= JFactory::getUser();
-		$groups	= implode(',', $user->getAuthorisedViewLevels());
+		if(empty($this->_pagination)) :
+			require_once (JPATH_COMPONENT . DS . 'helpers/html/pagination.php');
+			$limit = (int) $this->getState('list.limit') - (int) $this->getState('list.links');
+			$this->_pagination = new FaqPagination($this->getTotal(), $this->getStart(), $limit);
+		endif;
 
-		// Create a new query object.
-		$db		= $this->getDbo();
-		$query	= $db->getQuery(true);
-
-		// Select required fields from the categories.
-		$query->select($this->getState('list.select', 'a.*'));
-		$query->from($db->quoteName('#__faq') . ' AS a');
-		$query->where('a.access IN (' . $groups . ')');
-
-		// Filter by category.
-		if ($categoryId = $this->getState('category.id'))
-		{
-			$query->where('a.catid = ' . (int) $categoryId);
-			$query->select('c.title AS category_title, c.alias AS category_alias, c.access AS category_access');
-			$query->join('LEFT', '#__categories AS c ON c.id = a.catid');
-			$query->where('c.access IN (' . $groups . ')');
-		}
-
-		// Filter by state
-		$state = $this->getState('filter.published');
-		if (is_numeric($state))
-		{
-			$query->where('a.published = ' . (int) $state);
-		}
-
-		// Filter by start and end dates.
-		$nullDate = $db->Quote($db->getNullDate());
-		$date = JFactory::getDate();
-		$nowDate = $db->Quote($date->format($db->getDateFormat()));
-
-		if ($this->getState('filter.publish_date'))
-		{
-			$query->where('(a.publish_up = ' . $nullDate . ' OR a.publish_up <= ' . $nowDate . ')');
-			$query->where('(a.publish_down = ' . $nullDate . ' OR a.publish_down >= ' . $nowDate . ')');
-		}
-
-		// Filter by language
-		if ($this->getState('filter.language'))
-		{
-			$query->where('a.language in (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')');
-		}
-
-		// Add the list ordering clause.
-		$query->order($db->escape($this->getState('list.ordering', 'a.ordering')) . ' ' . $db->escape($this->getState('list.direction', 'ASC')));
-
-		return $query;
+		return $this->_pagination;
 	}
 
 	/**
@@ -249,34 +312,42 @@ class FaqModelCategory extends JModelList
 	{
 		if (!is_object($this->_item))
 		{
-			$app = JFactory::getApplication();
-			$menu = $app->getMenu();
-			$active = $menu->getActive();
-			$params = new JRegistry;
-
-			if ($active)
+			if(isset($this->state->params))
 			{
-				$params->loadString($active->params);
+				$params = $this->state->params;
+				$options = array();
+				$options['countItems'] = $params->get('show_cat_num_items', 1) || !$params->get('show_empty_categories', 0);
+			}
+			else {
+				$options['countItems'] = 0;
 			}
 
-			$options = array();
-			$options['countItems'] = $params->get('show_cat_items', 1) || $params->get('show_empty_categories', 0);
 			$categories = JCategories::getInstance('Faq', $options);
 			$this->_item = $categories->get($this->getState('category.id', 'root'));
 
-			if (is_object($this->_item))
-			{
+			// Compute selected asset permissions.
+			if (is_object($this->_item)) {
+				$user	= JFactory::getUser();
+				$userId	= $user->get('id');
+				$asset	= 'com_faq.category.'.$this->_item->id;
+
+				// Check general create permission.
+				if ($user->authorise('core.create', $asset)) {
+					$this->_item->getParams()->set('access-create', true);
+				}
+
+				// TODO: Why aren't we lazy loading the children and siblings?
 				$this->_children = $this->_item->getChildren();
 				$this->_parent = false;
-				if ($this->_item->getParent())
-				{
+
+				if ($this->_item->getParent()) {
 					$this->_parent = $this->_item->getParent();
 				}
+
 				$this->_rightsibling = $this->_item->getSibling();
 				$this->_leftsibling = $this->_item->getSibling(false);
 			}
-			else
-			{
+			else {
 				$this->_children = false;
 				$this->_parent = false;
 			}
