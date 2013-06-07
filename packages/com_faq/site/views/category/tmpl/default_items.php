@@ -13,7 +13,7 @@ $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
 ?>
 <?php if (empty($this->items) && $this->params->get('show_no_results', 1)) : ?>
-<p><?php echo JText::_('COM_SERVICE_NO_RESULTS'); ?></p>
+<p><?php echo JText::_('COM_FAQ_NO_RESULTS'); ?></p>
 <?php else : ?>
 <div class="accordion" id="accordion2">
 	<?php
@@ -21,7 +21,7 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 	foreach ($this->items as $item) : ?>
 	<div class="accordion-group">
 		<div class="accordion-heading">
-			<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse<?php echo $item->id; ?>" >
+			<a href="#" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" data-target="#collapse<?php echo $item->id; ?>" >
 				<i class="icon-question-sign"></i>
 				<?php echo $this->escape($item->title); ?>
 			</a>
@@ -36,7 +36,6 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 	$x++;
 	endforeach; ?>
 </div>
-
 <?php if ($this->params->def('show_pagination', 2) == 1  || ($this->params->get('show_pagination') == 2 && $this->pagination->get('pages.total') > 1)) : ?>
 <nav class="pagination pagination-centered">
 	<?php echo $this->pagination->getPagesLinks(); ?>
@@ -44,5 +43,5 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 	<p class="counter muted"><?php echo $this->pagination->getPagesCounter(); ?></p>
 	<?php endif; ?>
 </nav>
-<?php endif;
-endif;?>
+<?php endif;?>
+<?php endif;?>

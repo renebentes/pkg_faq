@@ -54,12 +54,11 @@ $doc->addStyleSheet(JURI::root() . 'media/com_faq/css/frontend.css');
 	<?php echo $this->loadTemplate('items'); ?>
 
 	<?php if (!empty($this->children[$this->category->id]) && $this->maxLevel != 0) : ?>
-	<div class="cat-children">
+	<section class="cat-children well well-small">
 		<?php if ($this->params->get('show_category_heading_title_text', 1) == 1) : ?>
 		<h3><?php echo JTEXT::_('JGLOBAL_SUBCATEGORIES'); ?></h3>
 		<?php endif; ?>
 		<?php echo $this->loadTemplate('children'); ?>
-	</div>
+	</section>
 	<?php endif; ?>
-
 </section>
