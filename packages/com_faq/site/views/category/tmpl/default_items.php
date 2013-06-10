@@ -9,6 +9,9 @@
 // No direct access.
 defined('_JEXEC') or die;
 
+$doc = JFactory::getDocument();
+$doc->addScript(JURI::root() . 'media/com_faq/js/faq.js');
+
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
 ?>
@@ -21,7 +24,7 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 	foreach ($this->items as $item) : ?>
 	<div class="accordion-group">
 		<div class="accordion-heading">
-			<a href="#" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" data-target="#collapse<?php echo $item->id; ?>" >
+			<a href="#collapse<?php echo $item->id; ?>" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" onclick="addHit(<?php echo $item->id; ?>);">
 				<i class="icon-question-sign"></i>
 				<?php echo $this->escape($item->title); ?>
 			</a>

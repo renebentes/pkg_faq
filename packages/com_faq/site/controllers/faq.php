@@ -273,4 +273,11 @@ class FaqControllerFaq extends JControllerForm
 
 		return $result;
 	}
+
+	public function hit()
+	{
+		$itemId = JRequest::getVar('Itemid', 'int');
+		$model = JModelLegacy::getInstace('Faq', 'FaqModel', array('ignore_request' => true));
+		$model->hit($itemId);
+	}
 }

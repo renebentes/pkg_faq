@@ -15,10 +15,11 @@ defined('_JEXEC') or die;
 		<?php foreach($this->children[$this->category->id] as $id => $child) :
 			if ($this->params->get('show_empty_categories') || $child->getNumItems(true) || count($child->getChildren())) : ?>
 				<li>
-					<a href="<?php echo JRoute::_(FaqHelperRoute::getCategoryRoute($child->id));?>"><?php echo $this->escape($child->title); ?></a>
-					<?php if ($this->params->get('show_cat_num_items', 1) == 1) : ?>
-						<span class="label label-info"><?php echo JText::_('COM_FAQ_NUM_ITEMS') . ' ' . $child->getNumItems(true); ?></span>
-					<?php endif; ?>
+					<a href="<?php echo JRoute::_(FaqHelperRoute::getCategoryRoute($child->id));?>"><?php echo $this->escape($child->title); ?>
+						<?php if ($this->params->get('show_cat_num_items', 1) == 1) : ?>
+							<span class="badge badge-info hasTooltip" rel="tooltip" data-original-title="<?php echo JText::_('COM_FAQ_NUM_ITEMS'); ?>" data-placement="right"><?php echo $child->getNumItems(true); ?></span>
+						<?php endif; ?>
+					</a>
 					<?php if (count($child->getChildren()) > 0 ) :
 						$this->children[$child->id] = $child->getChildren();
 						$this->category = $child;
