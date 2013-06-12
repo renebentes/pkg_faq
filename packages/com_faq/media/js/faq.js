@@ -3,9 +3,15 @@ if(jQuery && jQuery.noConflict) {
 }
 function addHit(id) {
 	if(!jQuery('[id="collapse' + id + '"]').hasClass('in')) {
-		jQuery.post(
-			'index.php?option=com_faq&view=faq&task=hit',
-			{Itemid : id}
-		);
+		jQuery.ajax({
+			url: 'index.php?option=com_faq&task=faq.savehitajax&format=json',
+			type: 'POST',
+			data: {
+				Itemid : id
+			},
+			dataType: 'json',
+			success: function(data) {
+			}
+		});
 	}
 }

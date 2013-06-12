@@ -29,7 +29,7 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 				<?php echo $this->escape($item->title); ?>
 			</a>
 		</div>
-		<div id="collapse<?php echo $item->id; ?>" class="accordion-body collapse<?php echo $x == 1 ? ' in' : ''; ?>">
+		<div id="collapse<?php echo $item->id; ?>" class="accordion-body collapse fade<?php echo $x == 1 ? ' in' : ''; ?>">
 			<div class="accordion-inner">
 				<?php echo JHtml::_('content.prepare', $item->description); ?>
 			</div>
