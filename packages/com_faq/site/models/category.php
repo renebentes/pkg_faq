@@ -25,15 +25,22 @@ class FaqModelCategory extends JModelList
 	 *
 	 * @var     array
 	 */
-	protected $_item = null;
+	protected $_item     = null;
 
-	protected $_records = null;
+	protected $_records  = null;
 
 	protected $_siblings = null;
 
 	protected $_children = null;
 
-	protected $_parent = null;
+	protected $_parent   = null;
+
+	/**
+	 * Model context string.
+	 *
+	 * @var		string
+	 */
+	protected $_context = 'com_faq.category';
 
 	/**
 	 * The category that applies.
@@ -160,32 +167,9 @@ class FaqModelCategory extends JModelList
 		}
 		$this->setState('list.direction', $listOrder);
 
-		// List state information
-		/*$limit = $app->getUserStateFromRequest('global.list.limit', 'limit', $app->getCfg('list_limit'), 'uint');
-		$this->setState('list.limit', $limit);
-
-		$limitstart = JRequest::getUInt('limitstart', 0);
-		$this->setState('list.start', $limitstart);
-
-		$orderCol = JRequest::getCmd('filter_order', 'ordering');
-
-		if (!in_array($orderCol, $this->filter_fields))
-		{
-			$orderCol = 'ordering';
-		}
-
-		$this->setState('list.ordering', $orderCol);
-
-		$listOrder = JRequest::getCmd('filter_order_Dir', 'ASC');
-
-		if (!in_array(strtoupper($listOrder), array('ASC', 'DESC', '')))
-		{
-			$listOrder = 'ASC';
-		}
-
-		$this->setState('list.direction', $listOrder);*/
-
 		$this->setState('list.start', JRequest::getUInt('limitstart', 0));
+
+		// Set limit for query
 		$limit = $app->getUserStateFromRequest('com_faq.category.list.' . $itemid . '.limit', 'limit', $params->get('display_num'), 'uint');
 		$this->setState('list.limit', $limit);
 
@@ -198,6 +182,8 @@ class FaqModelCategory extends JModelList
 		}
 
 		$this->setState('filter.language', $app->getLanguageFilter());
+
+		$this->setState('layout', JRequest::getCmd('layout'));
 	}
 
 	/**
@@ -278,7 +264,7 @@ class FaqModelCategory extends JModelList
 			$orderby .= $db->escape($orderCol) . ' ' . $db->escape($orderDirn) . ', ';
 		}
 
-		$orderby .= ' a.created, a.ordering';
+		$orderby .= ' a.created';
 
 		return $orderby;
 	}
@@ -293,7 +279,7 @@ class FaqModelCategory extends JModelList
 	function getPagination()
 	{
 		if(empty($this->_pagination)) :
-			require_once (JPATH_COMPONENT . DS . 'helpers/html/pagination.php');
+			require_once (JPATH_COMPONENT . '/helpers/html/pagination.php');
 			$limit = (int) $this->getState('list.limit') - (int) $this->getState('list.links');
 			$this->_pagination = new FaqPagination($this->getTotal(), $this->getStart(), $limit);
 		endif;
@@ -318,7 +304,8 @@ class FaqModelCategory extends JModelList
 				$options = array();
 				$options['countItems'] = $params->get('show_cat_num_items', 1) || !$params->get('show_empty_categories', 0);
 			}
-			else {
+			else
+			{
 				$options['countItems'] = 0;
 			}
 
@@ -329,7 +316,7 @@ class FaqModelCategory extends JModelList
 			if (is_object($this->_item)) {
 				$user	= JFactory::getUser();
 				$userId	= $user->get('id');
-				$asset	= 'com_faq.category.'.$this->_item->id;
+				$asset	= 'com_faq.category.' . $this->_item->id;
 
 				// Check general create permission.
 				if ($user->authorise('core.create', $asset)) {
@@ -340,14 +327,16 @@ class FaqModelCategory extends JModelList
 				$this->_children = $this->_item->getChildren();
 				$this->_parent = false;
 
-				if ($this->_item->getParent()) {
+				if ($this->_item->getParent())
+				{
 					$this->_parent = $this->_item->getParent();
 				}
 
 				$this->_rightsibling = $this->_item->getSibling();
 				$this->_leftsibling = $this->_item->getSibling(false);
 			}
-			else {
+			else
+			{
 				$this->_children = false;
 				$this->_parent = false;
 			}

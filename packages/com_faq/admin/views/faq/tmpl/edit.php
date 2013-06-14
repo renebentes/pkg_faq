@@ -77,6 +77,7 @@ $canDo = FaqHelper::getActions();
 		<?php echo $this->loadTemplate('publish'); ?>
 		<?php echo $this->loadTemplate('params'); ?>
 		<?php echo $this->loadTemplate('metadata'); ?>
+		<?php echo $this->loadTemplate('writer'); ?>
 		<?php echo JHtml::_('sliders.end'); ?>
 	</div>
 	<div>

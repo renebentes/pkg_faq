@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="2.5.0" type="plugin" group="search" method="upgrade">
+	<name>plg_search_faq</name>
+	<author>Rene Bentes Pinto</author>
+	<creationDate>13/06/2013</creationDate>
+	<copyright>(C) 2013 Rene Bentes Pinto. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see http://www.gnu.org/licenses/gpl-2.0.html</license>
+	<authorEmail>renebentes@yahoo.com.br</authorEmail>
+	<authorUrl></authorUrl>
+	<version>1.0</version>
+	<description>PLG_SEARCH_FAQ_XML_DESCRIPTION</description>
+	<files>
+		<filename plugin="faq">faq.php</filename>
+		<filename>index.html</filename>
+	</files>
+	<languages folder="language">
+		<language tag="pt-BR">pt-BR/pt-BR.plg_search_faq.ini</language>
+		<language tag="pt-BR">pt-BR/pt-BR.plg_search_faq.sys.ini</language>
+	</languages>
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+				<field name="search_limit" type="text" default="50" size="5" class="inputbox" label="JFIELD_PLG_SEARCH_SEARCHLIMIT_LABEL" description="JFIELD_PLG_SEARCH_SEARCHLIMIT_DESC" />
+				<field name="search_content" type="radio" default="0" label="JFIELD_PLG_SEARCH_ALL_LABEL" description="JFIELD_PLG_SEARCH_ALL_DESC">
+					<option value="0">JOFF</option>
+					<option value="1">JON</option>
+				</field>
+				<field name="search_archived" type="radio" default="0" label="JFIELD_PLG_SEARCH_ARCHIVED_LABEL" description="JFIELD_PLG_SEARCH_ARCHIVED_DESC">
+					<option value="0">JOFF</option>
+					<option value="1">JON</option>
+				</field>
+			</fieldset>
+		</fields>
+	</config>
+</extension>

@@ -8,3 +8,5 @@
 
 // No direct access.
 defined('_JEXEC') or die;
+
+var_dump($this->item);

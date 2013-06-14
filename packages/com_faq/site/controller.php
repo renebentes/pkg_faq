@@ -32,28 +32,35 @@ class FaqController extends JControllerLegacy
 	{
 		// Initialise variables.
 		$cachable = true;
-		$user     = JFactory::getUser();
 
 		// Set the default view name and format from the Request.
 		// Note we are using f_id to avoid collisions with the router and the return page.
 		// Frontend is a bit messier than the backend.
 		$id    = JRequest::getInt('f_id');
-		$vName = JRequest::getCmd('view', 'faqs');
+		$vName = JRequest::getCmd('view', 'categories');
 
 		JRequest::setVar('view', $vName);
 
-		if ($user->get('id') ||($_SERVER['REQUEST_METHOD'] == 'POST' && $vName = 'faqs'))
+
+		$user = JFactory::getUser();
+		if ($user->get('id') || ($_SERVER['REQUEST_METHOD'] == 'POST' && $vName = 'category'))
 		{
 			$cachable = false;
 		}
 
 		$safeurlparams = array(
-			'id'				=> 'INT',
-			'limit'				=> 'UINT',
-			'limitstart'		=> 'UINT',
-			'filter_order'		=> 'CMD',
-			'filter_order_Dir'	=> 'CMD',
-			'lang'				=> 'CMD'
+			'catid'            => 'INT',
+			'id'               => 'INT',
+			'cid'              => 'ARRAY',
+			'limit'            => 'UINT',
+			'limitstart'       => 'UINT',
+			'return'           => 'BASE64',
+			'filter'           => 'STRING',
+			'filter_order'     => 'CMD',
+			'filter_order_Dir' => 'CMD',
+			'print'            => 'BOOLEAN',
+			'lang'             => 'CMD',
+			'Itemid'           => 'INT'
 		);
 
 		// Check for edit form.
@@ -63,6 +70,8 @@ class FaqController extends JControllerLegacy
 			return JError::raiseError(403, JText::sprintf('JLIB_APPLICATION_ERROR_UNHELD_ID', $id));
 		}
 
-		return parent::display($cachable, $safeurlparams);
+		parent::display($cachable, $safeurlparams);
+
+		return $this;
 	}
 }

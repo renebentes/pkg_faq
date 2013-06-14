@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 2 or later; see http://www.gnu.org/licenses/gpl-2.0.html</license>
 	<authorEmail>renebentes@yahoo.com.br</authorEmail>
 	<authorUrl></authorUrl>
-	<version>1.3</version>
+	<version>1.4</version>
 	<description>COM_FAQ_XML_DESCRIPTION</description>
 	<scriptfile>script.php</scriptfile>
 	<install>

@@ -12,7 +12,7 @@ defined('_JEXEC') or die;
 ?>
 
 <?php echo JHtml::_('sliders.start', 'stat-pane'); ?>
-<?php echo JHtml::_('sliders.panel', JText::_('COM_FAQ_FIELDSET_FAQS'), 'faqs-panel'); ?>
+<?php echo JHtml::_('sliders.panel', JText::_('COM_FAQ_FIELDSET_FAQS_LAST'), 'faqs-panel'); ?>
 <table class="adminlist">
 	<thead>
 		<tr>

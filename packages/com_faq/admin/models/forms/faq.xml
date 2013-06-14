@@ -40,20 +40,28 @@
 		</fieldset>
 	</fields>
 
+	<fieldset name="metadata" label="JGLOBAL_FIELDSET_METADATA_OPTIONS">
+		<field name="metadesc" type="textarea" class="inputbox" rows="3" cols="30" label="JFIELD_META_DESCRIPTION_LABEL" description="JFIELD_META_DESCRIPTION_DESC" />
+		<field name="metakey" type="textarea" class="inputbox" rows="3" cols="30" label="JFIELD_META_KEYWORDS_LABEL" description="JFIELD_META_KEYWORDS_DESC" />
+	</fieldset>
+
 	<fields name="metadata">
-		<fieldset name="jmetadata" label="JGLOBAL_FIELDSET_METADATA_OPTIONS">
-			<field name="metadesc" type="textarea" class="inputbox" rows="3" cols="30" label="JFIELD_META_DESCRIPTION_LABEL" description="JFIELD_META_DESCRIPTION_DESC" />
-			<field name="metakey" type="textarea" class="inputbox" rows="3" cols="30" label="JFIELD_META_KEYWORDS_LABEL" description="JFIELD_META_KEYWORDS_DESC" />
-			<field name="robots" type="list" label="JFIELD_METADATA_ROBOTS_LABEL" description="JFIELD_METADATA_ROBOTS_DESC">
-				<option value="">JGLOBAL_USE_GLOBAL</option>
-				<option value="index, follow">JGLOBAL_INDEX_FOLLOW</option>
-				<option value="noindex, follow">JGLOBAL_NOINDEX_FOLLOW</option>
-				<option value="index, nofollow">JGLOBAL_INDEX_NOFOLLOW</option>
-				<option value="noindex, nofollow">JGLOBAL_NOINDEX_NOFOLLOW</option>
-			</field>
-			<field name="author" type="text" size="20" label="JAUTHOR" description="JFIELD_METADATA_AUTHOR_DESC" />
-			<field name="rights" type="text" label="JFIELD_META_RIGHTS_LABEL" description="JFIELD_META_RIGHTS_DESC" required="false" filter="string" cols="30" rows="2" />
-			<field name="xreference" type="text" class="inputbox" size="20" label="JFIELD_XREFERENCE_LABEL" description="JFIELD_XREFERENCE_DESC" />
+		<field name="robots" type="list" label="JFIELD_METADATA_ROBOTS_LABEL" description="JFIELD_METADATA_ROBOTS_DESC">
+			<option value="">JGLOBAL_USE_GLOBAL</option>
+			<option value="index, follow">JGLOBAL_INDEX_FOLLOW</option>
+			<option value="noindex, follow">JGLOBAL_NOINDEX_FOLLOW</option>
+			<option value="index, nofollow">JGLOBAL_INDEX_NOFOLLOW</option>
+			<option value="noindex, nofollow">JGLOBAL_NOINDEX_NOFOLLOW</option>
+		</field>
+		<field name="author" type="text" size="20" label="JAUTHOR" description="JFIELD_METADATA_AUTHOR_DESC" />
+		<field name="rights" type="text" label="JFIELD_META_RIGHTS_LABEL" description="JFIELD_META_RIGHTS_DESC" required="false" filter="string" cols="30" rows="2" />
+		<field name="xreference" type="text" class="inputbox" size="20" label="JFIELD_XREFERENCE_LABEL" description="JFIELD_XREFERENCE_DESC" />
+	</fields>
+
+	<fields name="writer">
+		<fieldset name="jwriter" label="COM_FAQ_FIELDSET_WRITER_OPTIONS">
+			<field name="name" type="text" size="20" label="COM_FAQ_FIELD_NAME_LABEL" description="COM_FAQ_FIELD_NAME_DESC" />
+			<field name="email" type="email" size="50" label="COM_FAQ_FIELD_EMAIL_LABEL" description="COM_FAQ_FIELD_EMAIL_DESC" />
 		</fieldset>
 	</fields>
 </form>

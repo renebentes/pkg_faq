@@ -21,37 +21,6 @@ jimport('joomla.application.component.modellist');
 class FaqModelFaqs extends JModelList
 {
 	/**
-	 * Category items data
-	 *
-	 * @var     array
-	 */
-	protected $_item = null;
-
-	protected $_records = null;
-
-	protected $_siblings = null;
-
-	protected $_children = null;
-
-	protected $_parent = null;
-
-	/**
-	 * The category that applies.
-	 *
-	 * @access  protected
-	 * @var     object
-	 */
-	protected $_category = null;
-
-	/**
-	 * The list of other faq categories.
-	 *
-	 * @access  protected
-	 * @var     array
-	 */
-	protected $_categories = null;
-
-	/**
 	 * Constructor.
 	 *
 	 * @param   array  $config  An optional associative array of configuration settings.
@@ -99,7 +68,7 @@ class FaqModelFaqs extends JModelList
 	 *
 	 * @since   2.5
 	 */
-	protected function populateState($ordering = null, $direction = null)
+	protected function populateState($ordering = 'ordering', $direction = 'ASC')
 	{
 		// Initialise variables.
 		$app    = JFactory::getApplication();
@@ -108,30 +77,26 @@ class FaqModelFaqs extends JModelList
 		$value = JRequest::getUInt('limit', $app->getCfg('list_limit', 0));
 		$this->setState('list.limit', $value);
 
-		$limitstart = JRequest::getUInt('limitstart', 0);
-		$this->setState('list.start', $limitstart);
+		$value = JRequest::getUInt('limitstart', 0);
+		$this->setState('list.start', $value);
 
 		$orderCol = JRequest::getCmd('filter_order', 'a.ordering');
-
 		if (!in_array($orderCol, $this->filter_fields))
 		{
 			$orderCol = 'a.ordering';
 		}
-
 		$this->setState('list.ordering', $orderCol);
 
 		$listOrder = JRequest::getCmd('filter_order_Dir', 'ASC');
-
 		if (!in_array(strtoupper($listOrder), array('ASC', 'DESC', '')))
 		{
 			$listOrder = 'ASC';
 		}
-
 		$this->setState('list.direction', $listOrder);
 
 		$params = $app->getParams();
 		$this->setState('params', $params);
-		$user	= JFactory::getUser();
+		$user = JFactory::getUser();
 
 		if ((!$user->authorise('core.edit.state', 'com_faq')) && (!$user->authorise('core.edit', 'com_faq')))
 		{
@@ -140,6 +105,10 @@ class FaqModelFaqs extends JModelList
 		}
 
 		$this->setState('filter.language', $app->getLanguageFilter());
+
+		$this->setState('filter.access', true);
+
+		$this->setState('layout', JRequest::getCmd('layout'));
 	}
 
 	/**
@@ -158,8 +127,11 @@ class FaqModelFaqs extends JModelList
 	{
 		// Compile the store id.
 		$id .= ':' . serialize($this->getState('filter.published'));
-		$id	.= ':' . serialize($this->getState('filter.category_id'));
 		$id .= ':' . $this->getState('filter.access');
+		$id .= ':' . $this->getState('filter.faq_id');
+		$id .= ':' . $this->getState('filter.faq_id.include');
+		$id	.= ':' . serialize($this->getState('filter.category_id'));
+		$id .= ':' . $this->getState('filter.category_id.include');
 		$id .= ':' . $this->getState('filter.language');
 
 		return parent::getStoreId($id);
@@ -175,23 +147,22 @@ class FaqModelFaqs extends JModelList
 	protected function getListQuery()
 	{
 		// Create a new query object.
-		$db     = $this->getDbo();
-		$query  = $db->getQuery(true);
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true);
 
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
 				'list.select',
-				'a.id, a.title, a.alias, a.description, ' .
-				'a.checked_out, a.checked_out_time, ' .
+				'a.id, a.title, a.alias, a.description, a.checked_out, a.checked_out_time, ' .
 				'a.catid, a.created, a.created_by, a.created_by_alias, ' .
 				// use created if modified is 0
-				'CASE WHEN a.modified = 0 THEN a.created ELSE a.modified END as modified, ' .
-					'a.modified_by, uam.name as modified_by_name,' .
+				'CASE WHEN a.modified = 0 THEN a.created ELSE a.modified END AS modified, ' .
+				'a.modified_by, uam.name AS modified_by_name,' .
 				// use created if publish_up is 0
-				'CASE WHEN a.publish_up = 0 THEN a.created ELSE a.publish_up END as publish_up,' .
-					'a.publish_down, a.params, a.metadata, a.access, ' .
-					'a.hits'
+				'CASE WHEN a.publish_up = 0 THEN a.created ELSE a.publish_up END AS publish_up,' .
+				'a.publish_down, a.images, a.params, a.metadata, a.metakey, a.metadesc, a.access, ' .
+				'a.hits'
 			)
 		);
 
@@ -200,20 +171,21 @@ class FaqModelFaqs extends JModelList
 		{
 			// If badcats is not null, this means that the FAQ is inside an archived category
 			// In this case, the state is set to 2 to indicate Archived (even if the FAQ state is Published)
-			$query->select($this->getState('list.select', 'CASE WHEN badcats.id is null THEN a.published ELSE 2 END AS published'));
+			$query->select($this->getState('list.select', 'CASE WHEN badcats.id IS NULL THEN a.published ELSE 2 END AS published'));
 		}
-		else {
+		else
+		{
 			// Process non-archived layout
 			// If badcats is not null, this means that the FAQ is inside an unpublished category
 			// In this case, the state is set to 0 to indicate Unpublished (even if the FAQ state is Published)
-			$query->select($this->getState('list.select', 'CASE WHEN badcats.id is not null THEN 0 ELSE a.published END AS published'));
+			$query->select($this->getState('list.select', 'CASE WHEN badcats.id IS NOT NULL THEN 0 ELSE a.published END AS published'));
 		}
 
-		$query->from($db->quoteName('#__faq') . ' AS a');
+		$query->from('#__faq AS a');
 
 		// Join over the categories
-		$query->select('c.title AS category_title, c.alias AS category_alias, c.access AS category_access');
-		$query->join('INNER', '#__categories AS c ON c.id = a.catid');
+		$query->select('c.title AS category_title, c.path AS category_route, c.access AS category_access, c.alias AS category_alias');
+		$query->join('LEFT', '#__categories AS c ON c.id = a.catid');
 
 		// Join over the users for the author and modified_by names.
 		$query->select("CASE WHEN a.created_by_alias > ' ' THEN a.created_by_alias ELSE ua.name END AS author");
@@ -228,34 +200,36 @@ class FaqModelFaqs extends JModelList
 		$subQuery->from('#__contact_details AS contact');
 		$subQuery->where('contact.published = 1');
 		$subQuery->group('contact.user_id, contact.language');
-		$query->select('contact.id as contactid' );
+		$query->select('contact.id AS contactid' );
 		$query->join('LEFT', '(' . $subQuery . ') AS contact ON contact.user_id = a.created_by');
 
 		// Join over the categories to get parent category titles
-		$query->select('parent.title as parent_title, parent.id as parent_id, parent.path as parent_route, parent.alias as parent_alias');
+		$query->select('parent.title AS parent_title, parent.id AS parent_id, parent.path AS parent_route, parent.alias AS parent_alias');
 		$query->join('LEFT', '#__categories as parent ON parent.id = c.parent_id');
 
 		// Sqlsrv change... aliased c.published to cat_published
 		// Join to check for category published state in parent categories up the tree
-		$query->select('c.published as cat_published, CASE WHEN badcats.id is null THEN c.published ELSE 0 END AS parents_published');
-		$subquery = 'SELECT cat.id as id FROM #__categories AS cat JOIN #__categories AS parent ';
+		$query->select('c.published AS cat_published, CASE WHEN badcats.id IS NULL THEN c.published ELSE 0 END AS parents_published');
+		$subquery = 'SELECT cat.id AS id FROM #__categories AS cat JOIN #__categories AS parent ';
 		$subquery .= 'ON cat.lft BETWEEN parent.lft AND parent.rgt ';
 		$subquery .= 'WHERE parent.extension = ' . $db->quote('com_faq');
 
-		if ($this->getState('filter.published') == 2) {
+		if ($this->getState('filter.published') == 2)
+		{
 			// Find any up-path categories that are archived
 			// If any up-path categories are archived, include all children in archived layout
 			$subquery .= ' AND parent.published = 2 GROUP BY cat.id ';
 
 			// Set effective state to archived if up-path category is archived
-			$publishedWhere = 'CASE WHEN badcats.id is null THEN a.published ELSE 2 END';
+			$publishedWhere = 'CASE WHEN badcats.id IS NULL THEN a.published ELSE 2 END';
 		}
-		else {
+		else
+		{
 			// Find any up-path categories that are not published
 			// If all categories are published, badcats.id will be null, and we just use the Faq state
 			$subquery .= ' AND parent.published != 1 GROUP BY cat.id ';
 			// Select state to unpublished if up-path category is unpublished
-			$publishedWhere = 'CASE WHEN badcats.id is null THEN a.published ELSE 0 END';
+			$publishedWhere = 'CASE WHEN badcats.id IS NULL THEN a.published ELSE 0 END';
 		}
 		$query->join('LEFT OUTER', '(' . $subquery . ') AS badcats ON badcats.id = c.id');
 
@@ -263,8 +237,8 @@ class FaqModelFaqs extends JModelList
 		if ($access = $this->getState('filter.access')) {
 			$user	= JFactory::getUser();
 			$groups	= implode(',', $user->getAuthorisedViewLevels());
-			$query->where('a.access IN ('.$groups.')');
-			$query->where('c.access IN ('.$groups.')');
+			$query->where('a.access IN (' . $groups . ')');
+			$query->where('c.access IN (' . $groups . ')');
 		}
 
 		// Filter by published state
@@ -282,31 +256,51 @@ class FaqModelFaqs extends JModelList
 			$query->where($publishedWhere . ' IN (' . $published . ')');
 		}
 
+		// Filter by a single or group of faqs.
+		$faqId = $this->getState('filter.faq_id');
+		if (is_numeric($faqId))
+		{
+			$type = $this->getState('filter.faq_id.include', true) ? '= ' : '<> ';
+			$query->where('a.id ' . $type . (int) $faqId);
+		}
+		elseif (is_array($faqId))
+		{
+			JArrayHelper::toInteger($faqId);
+			$faqId = implode(',', $faqId);
+			$type = $this->getState('filter.faq_id.include', true) ? 'IN' : 'NOT IN';
+			$query->where('a.id ' . $type .' (' . $faqId .')');
+		}
+
 		// Filter by a single or group of categories
 		$categoryId = $this->getState('filter.category_id');
 		if (is_numeric($categoryId))
 		{
-			/*// Add subcategory check
-			if($this->getState('filter.subcategories', false))
+			$type = $this->getState('filter.category_id.include', true) ? '= ' : '<> ';
+
+			// Add subcategory check
+			$includeSubcategories = $this->getState('filter.subcategories', false);
+			$categoryEquals = 'a.catid ' . $type . (int) $categoryId;
+
+			if ($includeSubcategories)
 			{
 				$levels = (int) $this->getState('filter.max_category_levels', '1');
 
 				// Create a subquery for the subcategory list
 				$subQuery = $db->getQuery(true);
 				$subQuery->select('sub.id');
-				$subQuery->from('#__categories as sub');
-				$subQuery->join('INNER', '#__categories as this ON sub.lft > this.lft AND sub.rgt < this.rgt');
-				$subQuery->where('this.id = '.(int) $categoryId);
+				$subQuery->from('#__categories AS sub');
+				$subQuery->join('INNER', '#__categories AS this ON sub.lft > this.lft AND sub.rgt < this.rgt');
+				$subQuery->where('this.id = ' . (int) $categoryId);
 				if ($levels >= 0) {
 					$subQuery->where('sub.level <= this.level + ' . $levels);
 				}
 				// Add the subquery to the main query
-				$query->where('(a.catid = ' . (int) $categoryId . ' OR a.catid IN (' . $subQuery->__toString() .'))');
+				$query->where('(' . $categoryEquals . ' OR a.catid IN (' . $subQuery->__toString() . '))');
 			}
 			else
-			{*/
-				$query->where('a.catid = ' . (int) $categoryId);
-			//}
+			{
+				$query->where($categoryEquals);
+			}
 		}
 		elseif (is_array($categoryId) && (count($categoryId) > 0))
 		{
@@ -314,28 +308,36 @@ class FaqModelFaqs extends JModelList
 			$categoryId = implode(',', $categoryId);
 			if (!empty($categoryId))
 			{
-				$query->where('a.catid IN (' . $categoryId . ')');
+				$type = $this->getState('filter.category_id.include', true) ? 'IN' : 'NOT IN';
+				$query->where('a.catid '. $type . ' (' . $categoryId . ')');
 			}
 		}
 
 		// Filter by start and end dates.
 		$nullDate = $db->Quote($db->getNullDate());
-		$date = JFactory::getDate();
-		$nowDate = $db->Quote($date->toSql());
+		$nowDate = $db->Quote(JFactory::getDate()->toSql());
+
 		$query->where('(a.publish_up = ' . $nullDate . ' OR a.publish_up <= ' . $nowDate . ')');
 		$query->where('(a.publish_down = ' . $nullDate . ' OR a.publish_down >= ' . $nowDate . ')');
 
 		// Filter by language
 		if ($this->getState('filter.language'))
 		{
-			$query->where('a.language in (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')');
+			$query->where('a.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')');
 			$query->where('(contact.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ') OR contact.language IS NULL)');
 		}
 
 		// Add the list ordering clause.
 		$query->order($db->escape($this->getState('list.ordering', 'a.ordering')) . ' ' . $db->escape($this->getState('list.direction', 'ASC')));
 
-		$query->group('a.id, a.title, a.alias, a.description, a.checked_out, a.checked_out_time, a.catid, a.created_by, a.created_by_alias, a.created, a.modified, a.modified_by, uam.name, a.publish_up, a.params, a.metadata, a.access, a.hits, a.published, a.publish_down, badcats.id, c.title, c.path, c.access, c.alias, uam.id, ua.name, ua.email, contact.id, parent.title, parent.id, parent.path, parent.alias, c.published, c.lft, a.ordering, parent.lft, c.id');
+		$query->group(
+			'a.id, a.title, a.alias, a.description, a.checked_out, a.checked_out_time, a.catid, ' .
+			'a.created_by, a.created_by_alias, a.created, a.modified, a.modified_by, uam.name, ' .
+			'a.publish_up, a.params, a.images, a.metakey, a.metadesc, a.metadata, a.access, a.hits, ' .
+			'a.published, a.publish_down, badcats.id, c.title, c.path, c.access, c.alias, uam.id, '.
+			'ua.name, ua.email, contact.id, parent.title, parent.id, parent.path, parent.alias, ' .
+			'c.published, c.lft, a.ordering, parent.lft, c.id'
+		);
 
 		return $query;
 	}
@@ -350,11 +352,11 @@ class FaqModelFaqs extends JModelList
 	public function getItems()
 	{
 		// Invoke the parent getItems method to get the main list
-		$items = parent::getItems();
-		$user	= JFactory::getUser();
-		$userId	= $user->get('id');
-		$guest	= $user->get('guest');
-		$groups	= $user->getAuthorisedViewLevels();
+		$items  = parent::getItems();
+		$user   = JFactory::getUser();
+		$userId = $user->get('id');
+		$guest  = $user->get('guest');
+		$groups = $user->getAuthorisedViewLevels();
 
 		// Get the global params
 		$globalParams = JComponentHelper::getParams('com_faq', true);
@@ -365,22 +367,26 @@ class FaqModelFaqs extends JModelList
 			$itemParams = new JRegistry;
 			$itemParams->loadString($item->params);
 
+			$item->layout = $itemParams->get('layout');
 			$item->params = clone $this->getState('params');
 			$item->params->merge($itemParams);
 
 			// Compute the asset access permissions.
 			// Technically guest could edit an faq, but lets not check that to improve performance a little.
 			if (!$guest) {
-				$asset	= 'com_faq.faq.'.$item->id;
+				$asset	= 'com_faq.faq.' . $item->id;
 
 				// Check general edit permission first.
-				if ($user->authorise('core.edit', $asset)) {
+				if ($user->authorise('core.edit', $asset))
+				{
 					$item->params->set('access-edit', true);
 				}
 				// Now check if edit.own is available.
-				elseif (!empty($userId) && $user->authorise('core.edit.own', $asset)) {
+				elseif (!empty($userId) && $user->authorise('core.edit.own', $asset))
+				{
 					// Check for a valid user and that they are the owner.
-					if ($userId == $item->created_by) {
+					if ($userId == $item->created_by)
+					{
 						$item->params->set('access-edit', true);
 					}
 				}
@@ -388,16 +394,20 @@ class FaqModelFaqs extends JModelList
 
 			$access = $this->getState('filter.access');
 
-			if ($access) {
+			if ($access)
+			{
 				// If the access filter has been set, we already have only the faqs this user can view.
 				$item->params->set('access-view', true);
 			}
-			else {
+			else
+			{
 				// If no access filter is set, the layout takes some responsibility for display of limited information.
-				if ($item->catid == 0 || $item->category_access === null) {
+				if ($item->catid == 0 || $item->category_access === null)
+				{
 					$item->params->set('access-view', in_array($item->access, $groups));
 				}
-				else {
+				else
+				{
 					$item->params->set('access-view', in_array($item->access, $groups) && in_array($item->category_access, $groups));
 				}
 			}

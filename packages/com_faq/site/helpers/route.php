@@ -34,7 +34,7 @@ abstract class FaqHelperRoute
 	 *
 	 * @since   2.5
 	 */
-	public static function getFaqRoute($id, $catid)
+	public static function getFaqRoute($id, $catid = 0, $language = 0)
 	{
 		$needles = array(
 			'faq' => array((int) $id)
@@ -57,6 +57,25 @@ abstract class FaqHelperRoute
 			}
 		}
 
+		if ($language && $language != "*" && JLanguageMultilang::isEnabled())
+		{
+			$db    = JFactory::getDBO();
+			$query = $db->getQuery(true);
+			$query->select('a.sef AS sef');
+			$query->select('a.lang_code AS lang_code');
+			$query->from('#__languages AS a');
+			$db->setQuery($query);
+			$langs = $db->loadObjectList();
+			foreach ($langs as $lang)
+			{
+				if ($language == $lang->lang_code)
+				{
+					$language = $lang->sef;
+					$link .= '&lang=' . $language;
+				}
+			}
+		}
+
 		if ($item = self::_findItem($needles))
 		{
 			$link .= '&Itemid=' . $item;
@@ -70,7 +89,7 @@ abstract class FaqHelperRoute
 	}
 
 	/**
-	 * Get the categiry route
+	 * Get the category route
 	 *
 	 * @param   int  $catid  The id of the category.
 	 *
@@ -128,6 +147,30 @@ abstract class FaqHelperRoute
 					}
 				}
 			}
+		}
+
+		return $link;
+	}
+
+	/**
+	 * Get the Form route
+	 *
+	 * @param   int  $id  The id of the form.
+	 *
+	 * @return  string
+	 *
+	 * @since   2.5
+	 */
+	public static function getFormRoute($id)
+	{
+		// Create the link
+		if ($id)
+		{
+			$link = 'index.php?option=com_faq&task=faq.edit&f_id=' . $id;
+		}
+		else
+		{
+			$link = 'index.php?option=com_faq&task=faq.edit&f_id=0';
 		}
 
 		return $link;
@@ -192,7 +235,7 @@ abstract class FaqHelperRoute
 		else
 		{
 			$active = $menus->getActive();
-			if ($active)
+			if ($active && $active->component == 'com_faq')
 			{
 				return $active->id;
 			}

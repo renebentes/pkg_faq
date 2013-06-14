@@ -53,7 +53,7 @@ class FaqControllerFaq extends JControllerForm
 	{
 		// Initialise variables.
 		$user       = JFactory::getUser();
-		$categoryId = JArrayHelper::getValue($data, 'catid', JRequest::getInt('id'), 'int');
+		$categoryId = JArrayHelper::getValue($data, 'catid', JRequest::getInt('catid'), 'int');
 		$allow      = null;
 
 		if ($categoryId)
@@ -87,9 +87,9 @@ class FaqControllerFaq extends JControllerForm
 	{
 		// Initialise variables.
 		$recordId = (int) isset($data[$key]) ? $data[$key] : 0;
-		$user	= JFactory::getUser();
-		$userId	= $user->get('id');
-		$asset		= 'com_faq.faq.'.$recordId;
+		$user     = JFactory::getUser();
+		$userId   = $user->get('id');
+		$asset    = 'com_faq.faq.' . $recordId;
 
 		// Check general edit permission first.
 		if ($user->authorise('core.edit', $asset))
@@ -189,20 +189,39 @@ class FaqControllerFaq extends JControllerForm
 	 *
 	 * @since   2.5
 	 */
-	protected function getRedirectToItemAppend($recordId = null, $urlVar = null)
+	protected function getRedirectToItemAppend($recordId = null, $urlVar = 'f_id')
 	{
-		$append = parent::getRedirectToItemAppend($recordId, $urlVar);
-		$itemId = JRequest::getInt('Itemid');
-		$return = $this->getReturnPage();
+		// Need to override the parent method completely.
+		$tmpl   = JRequest::getCmd('tmpl');
+		$layout = JRequest::getCmd('layout', 'edit');
+		$append = '';
+
+		// Setup redirect info.
+		if ($tmpl)
+		{
+			$append .= '&tmpl=' . $tmpl;
+		}
+
+		$append .= '&layout=edit';
+
+		if ($recordId)
+		{
+			$append .= '&' . $urlVar . '=' . $recordId;
+		}
 
 		if ($itemId)
 		{
 			$append .= '&Itemid=' . $itemId;
 		}
 
+		if($catId)
+		{
+			$append .= '&catid=' . $catId;
+		}
+
 		if ($return)
 		{
-			$append .= '&return=' . base64_encode($return);
+			$append .= '&return=' . base64_encode(urlencode($return));
 		}
 
 		return $append;
@@ -221,13 +240,13 @@ class FaqControllerFaq extends JControllerForm
 	{
 		$return = JRequest::getVar('return', null, 'default', 'base64');
 
-		if (empty($return) || !JUri::isInternal(base64_decode($return)))
+		if (empty($return) || !JUri::isInternal(urldecode(base64_decode($return))))
 		{
 			return JURI::base();
 		}
 		else
 		{
-			return base64_decode($return);
+			return urldecode(base64_decode($return));
 		}
 	}
 

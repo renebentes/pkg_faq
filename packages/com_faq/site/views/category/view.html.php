@@ -24,7 +24,7 @@ class FaqViewCategory extends JViewLegacy
 
 	protected $category;
 
-	protected $categories;
+	protected $children;
 
 	protected $pagination;
 
@@ -40,11 +40,11 @@ class FaqViewCategory extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$app    = JFactory::getApplication();
-		$user   = JFactory::getUser();
-		$params = $app->getParams();
+		$params		= $app->getParams();
 
 		// Get some data from the models
 		$state      = $this->get('State');
+		$params		= $state->params;
 		$items      = $this->get('Items');
 		$category   = $this->get('Category');
 		$children   = $this->get('Children');
@@ -69,6 +69,7 @@ class FaqViewCategory extends JViewLegacy
 		}
 
 		// Check whether category access level allows access.
+		$user   = JFactory::getUser();
 		$groups = $user->getAuthorisedViewLevels();
 
 		if (!in_array($category->access, $groups))
@@ -83,10 +84,17 @@ class FaqViewCategory extends JViewLegacy
 			$item = &$items[$i];
 			$item->slug = $item->alias ? ($item->id . ':' . $item->alias) : $item->id;
 			$item->catslug = $item->category_alias ? ($item->catid . ':' . $item->category_alias) : $item->catid;
-			$temp = new JRegistry;
+
+			$temp		= new JRegistry();
 			$temp->loadString($item->params);
 			$item->params = clone($params);
 			$item->params->merge($temp);
+
+			// No link for ROOT category
+			if ($item->parent_alias == 'root')
+			{
+				$item->parent_slug = null;
+			}
 		}
 
 		// Setup the category parameters.
@@ -94,37 +102,39 @@ class FaqViewCategory extends JViewLegacy
 		$category->params = clone($params);
 		$category->params->merge($cparams);
 
-		$children = array($category->id => $children);
-
-		// Escape strings for HTML output
-		$this->pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
-
-		$maxLevel = $params->get('maxLevel', -1);
-		$this->assignRef('maxLevel',   $maxLevel);
-		$this->assignRef('state',      $state);
-		$this->assignRef('items',      $items);
-		$this->assignRef('category',   $category);
-		$this->assignRef('children',   $children);
-		$this->assignRef('params',     $params);
-		$this->assignRef('parent',     $parent);
-		$this->assignRef('pagination', $pagination);
-
 		// Check for layout override only if this is not the active menu item
 		// If it is the active menu item, then the view and category id will match
 		$active = $app->getMenu()->getActive();
 
-		if ((!$active) || ((strpos($active->link, 'view=category') === false) || (strpos($active->link, '&id=' . (string) $this->category->id) === false)))
+		if ((!$active) || ((strpos($active->link, 'view=category') === false) || (strpos($active->link, '&id=' . (string) $category->id) === false)))
 		{
+			// Get the layout from the merged category params
 			if ($layout = $category->params->get('category_layout'))
 			{
 				$this->setLayout($layout);
 			}
 		}
+		// At this point, we are in a menu item, so we don't override the layout
 		elseif (isset($active->query['layout']))
 		{
 			// We need to set the layout in case this is an alternative menu item (with an alternative layout)
 			$this->setLayout($active->query['layout']);
 		}
+
+		$children = array($category->id => $children);
+
+		//Escape strings for HTML output
+		$this->pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
+
+		$this->assignRef('maxLevel', $params->get('maxLevel', -1));
+		$this->assignRef('state', $state);
+		$this->assignRef('items', $items);
+		$this->assignRef('category', $category);
+		$this->assignRef('children', $children);
+		$this->assignRef('params', $params);
+		$this->assignRef('parent', $parent);
+		$this->assignRef('pagination', $pagination);
+		$this->assignRef('user', $user);
 
 		$this->_prepareDocument();
 

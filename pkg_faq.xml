@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="package" version="2.5.0" method="upgrade">
+	<name>Faq Package</name>
+	<author>Rene Bentes Pinto</author>
+	<creationDate>13/06/2013</creationDate>
+	<copyright>(C) 2012 Rene Bentes Pinto, Inc. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see http://www.gnu.org/licenses/gpl-2.0.html</license>
+	<authorEmail>renebentes@yahoo.com.br</authorEmail>
+	<authorUrl></authorUrl>
+	<version>1.4</version>
+	<description>Faq package to combine multiple extensions</description>
+	<packagename>faq</packagename>
+	<url></url>
+	<packager>Faq Package Team</packager>
+	<packagerurl></packagerurl>
+	<update></update>
+	<files folder="packages">
+		<file type="component" id="faq">com_faq</file>
+		<file type="plugin" id="faq" group="search" client="site">plg_search_faq</file>
+	</files>
+</extension>

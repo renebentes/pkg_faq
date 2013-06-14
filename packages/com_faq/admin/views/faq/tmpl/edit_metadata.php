@@ -9,21 +9,29 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-foreach ($this->form->getFieldsets('metadata') as $name => $fieldSet):
-	$element = $this->form->getFieldset($name);
-	if ($name == 'jmetadata' && !empty($element)) :
-		echo JHtml::_('sliders.panel', JText::_($fieldSet->label), $name . '-options');
-		if (isset($fieldSet->description) && trim($fieldSet->description)):
-			echo '<p class="tip">' . $this->escape(JText::_($fieldSet->description)) . '</p>';
-		endif;
-		?>
-		<fieldset class="panelform">
-			<ul class="adminformlist">
-			<?php foreach ($element as $field): ?>
-				<li><?php echo $field->label; ?>
-				<?php echo $field->input; ?></li>
-			<?php endforeach; ?>
-			</ul>
-		</fieldset>
-	<?php endif;
-endforeach;
+$fieldSets = $this->form->getFieldsets();
+
+echo JHtml::_('sliders.panel', JText::_($fieldSets['metadata']->label), 'metadata-options');
+if (isset($fieldSets['metadata']->description) && trim($fieldSets['metadata']->description)):
+	echo '<p class="tip">' . $this->escape(JText::_($fieldSets['metadata']->description)) . '</p>';
+endif; ?>
+<fieldset class="panelform">
+	<ul class="adminformlist">
+		<?php foreach ($this->form->getFieldset('metadata') as $field) : ?>
+			<li>
+				<?php if (!$field->hidden) :
+					echo $field->label;
+				endif;
+				echo $field->input; ?>
+			</li>
+		<?php endforeach;
+		foreach($this->form->getGroup('metadata') as $field): ?>
+			<li>
+				<?php if (!$field->hidden) :
+					echo $field->label;
+				endif;
+				echo $field->input; ?>
+			</li>
+		<?php endforeach; ?>
+	</ul>
+</fieldset>

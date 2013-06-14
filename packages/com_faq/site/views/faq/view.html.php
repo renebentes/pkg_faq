@@ -37,30 +37,18 @@ class FaqViewFaq extends JViewLegacy
 	public function display($tpl = null)
 	{
 		// Initialise variables.
-		$app   = JFactory::getApplication();
-		$$this->user  = JFactory::getUser();
+		$app        = JFactory::getApplication();
+		$user       = JFactory::getUser();
+		$userId     = $user->get('id');
 		$dispatcher = JDispatcher::getInstance();
 
 		// Get view related request variables.
 		$this->print = JRequest::getBool('print');
-
-		// Get model data.
 		$this->state = $this->get('State');
 		$this->item  = $this->get('Item');
-
-		if ($this->item)
-		{
-			// Get Category Model data
-			$categoryModel = JModelLegacy::getInstance('Category', 'FaqModel', array('ignore_request' => true));
-			$categoryModel->setState('category.id', $item->catid);
-			$categoryModel->setState('list.ordering', 'a.name');
-			$categoryModel->setState('list.direction', 'asc');
-
-			$items = $categoryModel->getItems();
-		}
+		$this->user  = $user;
 
 		// Check for errors.
-		// @TODO Maybe this could go into JComponentHelper::raiseErrors($this->get('Errors'))
 		if (count($errors = $this->get('Errors')))
 		{
 			JError::raiseWarning(500, implode("\n", $errors));
@@ -72,38 +60,26 @@ class FaqViewFaq extends JViewLegacy
 		$item = &$this->item;
 
 		// Add router helpers.
-		$item->slug = $item->alias ? ($item->id . ':' . $item->alias) : $item->id;
-		$item->catslug = $item->category_alias ? ($item->catid . ':' . $item->category_alias) : $item->catid;
-		$item->parent_slug = $item->category_alias ? ($item->parent_id . ':' . $item->parent_alias) : $item->parent_id;
-
-		// Check if cache directory is writeable
-		$cacheDir = JPATH_CACHE . '/';
-
-		if (!is_writable($cacheDir))
-		{
-			JError::raiseNotice('0', JText::_('COM_FAQ_CACHE_DIRECTORY_UNWRITABLE'));
-
-			return;
-		}
+		$item->slug			= $item->alias ? ($item->id . ':' .$item->alias) : $item->id;
+		$item->catslug		= $item->category_alias ? ($item->catid . ':' . $item->category_alias) : $item->catid;
+		$item->parent_slug	= $item->category_alias ? ($item->parent_id . ':' . $item->parent_alias) : $item->parent_id;
 
 		// Merge faq params. If this is single-faq view, menu params override faq params
 		// Otherwise, faq params override menu item params
 		$this->params = $this->state->get('params');
-		$active = $app->getMenu()->getActive();
-		$temp = clone ($this->params);
+		$active       = $app->getMenu()->getActive();
+		$temp         = clone ($this->params);
 
 		// Check to see which parameters should take priority
 		if ($active)
 		{
 			$currentLink = $active->link;
-
 			// If the current view is the active item and an faq view for this faq, then the menu item params take priority
-			if (strpos($currentLink, 'view=faq') && (strpos($currentLink, '&id=' . (string) $item->id)))
+			if (strpos($currentLink, 'view=faq') && (strpos($currentLink, '&id='.(string) $item->id)))
 			{
 				// $item->params are the faq params, $temp are the menu item params
 				// Merge so that the menu item params take priority
 				$item->params->merge($temp);
-
 				// Load layout from active query (in case it is an alternative menu item)
 				if (isset($active->query['layout']))
 				{
@@ -118,6 +94,7 @@ class FaqViewFaq extends JViewLegacy
 				$item->params = $temp;
 
 				// Check for alternative layouts (since we are not in a single-faq menu item)
+				// Single-faq menu item layout takes priority over alt layout for an faq
 				if ($layout = $item->params->get('faq_layout'))
 				{
 					$this->setLayout($layout);
@@ -129,24 +106,22 @@ class FaqViewFaq extends JViewLegacy
 			// Merge so that faq params take priority
 			$temp->merge($item->params);
 			$item->params = $temp;
-
 			// Check for alternative layouts (since we are not in a single-faq menu item)
-			if ($layout = $item->params->get('faq_layout'))
-			{
+			// Single-faq menu item layout takes priority over alt layout for an faq
+			if ($layout = $item->params->get('faq_layout')) {
 				$this->setLayout($layout);
 			}
 		}
 
-		$offset = $state->get('list.offset');
+		$offset = $this->state->get('list.offset');
 
-		// Check the access to the faq
-		$levels = $this->user->getAuthorisedViewLevels();
-
-		if (!in_array($item->access, $levels) or ((in_array($item->access, $levels) and (!in_array($item->category_access, $levels)))))
+		// Check the view access to the faq (the model has already computed the values).
+		if ($item->params->get('access-view') != true && (($item->params->get('show_noauth') != true && $user->get('guest'))))
 		{
 			JError::raiseWarning(403, JText::_('JERROR_ALERTNOAUTHOR'));
 
 			return;
+
 		}
 
 		// Increment the hit counter of the faq.
@@ -155,8 +130,8 @@ class FaqViewFaq extends JViewLegacy
 			$model->hit();
 		}
 
-		// Escape strings for HTML output
-		$this->pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
+		//Escape strings for HTML output
+		$this->pageclass_sfx = htmlspecialchars($this->item->params->get('pageclass_sfx'));
 
 		$this->_prepareDocument();
 
@@ -197,15 +172,15 @@ class FaqViewFaq extends JViewLegacy
 		if ($menu && ($menu->query['option'] != 'com_faq' || $menu->query['view'] != 'faq' || $id != $this->item->id))
 		{
 			// If this is not a single faq menu item, set the page title to the faq title
-			if ($this->item->name)
+			if ($this->item->title)
 			{
-				$title = $this->item->name;
+				$title = $this->item->title;
 			}
 
-			$path = array(array('title' => $this->item->name, 'link' => ''));
+			$path = array(array('title' => $this->item->title, 'link' => ''));
 			$category = JCategories::getInstance('Faq')->get($this->item->catid);
 
-			while (($menu->query['option'] != 'com_faq' || $menu->query['view'] == 'faq' || $id != $category->id) && $category->id > 1)
+			while ($category && ($menu->query['option'] != 'com_faq' || $menu->query['view'] == 'faq' || $id != $category->id) && $category->id > 1)
 			{
 				$path[] = array('title' => $category->title, 'link' => FaqHelperRoute::getCategoryRoute($category->id));
 				$category = $category->getParent();
@@ -234,7 +209,7 @@ class FaqViewFaq extends JViewLegacy
 
 		if (empty($title))
 		{
-			$title = $this->item->name;
+			$title = $this->item->title;
 		}
 		$this->document->setTitle($title);
 
@@ -261,11 +236,6 @@ class FaqViewFaq extends JViewLegacy
 			$this->document->setMetadata('robots', $this->params->get('robots'));
 		}
 
-		if ($app->getCfg('MetaTitle') == '1')
-		{
-			$this->document->setMetaData('title', $this->item->name);
-		}
-
 		if ($app->getCfg('MetaAuthor') == '1')
 		{
 			$this->document->setMetaData('author', $this->item->author);
@@ -279,6 +249,11 @@ class FaqViewFaq extends JViewLegacy
 			{
 				$this->document->setMetadata($k, $v);
 			}
+		}
+
+		if ($this->print)
+		{
+			$this->document->setMetaData('robots', 'noindex, nofollow');
 		}
 	}
 }

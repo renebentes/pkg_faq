@@ -1,7 +1,10 @@
 pkg_faq
 =============
 
-Componente para gerenciamento de FAQs com suporte para Joomla! 2.5 e template com Twitter Bootstrap.
+Pacote de Extensão para gerenciamento de FAQs com suporte para Joomla! 2.5 e template com [Twitter Bootstrap](www.getbootstrap.com).
+
+* Componente: com_faq
+* Plugin: plg_search_faq
 
 Author
 ------
@@ -33,10 +36,13 @@ Release Notes
 	# Secure fix
 	! Relevant Message
 
+######1.4
+	+ Formulário para envio de perguntas na visualização de lista por categoria
+	+ Campos no banco de dados
 ######1.3
 	+ Script de instalação com tratamento de erros e remoção de arquivos desnecessários
 	+ Visualização no frontend para lista de FAQs por categoria
-	- Campos desnecessários no banco de dados
+	- Campos não usados no banco de dados
 ######1.2
 	^ Campo state para published
 	- Opção de preferências na view faqs
@@ -44,4 +50,4 @@ Release Notes
 ######1.1
 	+ Primeira compilação com funcionalidades básicas (CRUD apenas no backend)
 ######1.0
-	! Estruturação do componente
+	! Estruturação do pacote
