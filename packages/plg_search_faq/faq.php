@@ -10,6 +10,7 @@
 defined('_JEXEC') or die;
 
 require_once JPATH_SITE . '/components/com_faq/helpers/route.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_search/helpers/search.php';
 
 /**
  * Faq Search plugin
@@ -109,6 +110,7 @@ class plgSearchFaq extends JPlugin
 		}
 
 		$section = JText::_('PLG_SEARCH_FAQ');
+
 		$wheres  = array();
 
 		switch ($phrase)
@@ -172,7 +174,7 @@ class plgSearchFaq extends JPlugin
 
 			// Sqlsrv changes
 			$case_when = ' CASE WHEN ';
-			$case_when .= $query->charLength('a.alias', '!=', '0');
+			$case_when .= $query->charLength('a.alias');
 			$case_when .= ' THEN ';
 			$a_id      = $query->castAsChar('a.id');
 			$case_when .= $query->concatenate(array($a_id, 'a.alias'), ':');
@@ -180,7 +182,7 @@ class plgSearchFaq extends JPlugin
 			$case_when .= $a_id . ' END as slug';
 
 			$case_when1 = ' CASE WHEN ';
-			$case_when1 .= $query->charLength('c.alias', '!=', '0');
+			$case_when1 .= $query->charLength('c.alias');
 			$case_when1 .= ' THEN ';
 			$c_id       = $query->castAsChar('c.id');
 			$case_when1 .= $query->concatenate(array($c_id, 'c.alias'), ':');

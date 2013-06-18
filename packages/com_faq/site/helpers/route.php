@@ -16,6 +16,7 @@ jimport('joomla.application.categories');
 /**
  * Faq Component Route Helper
  *
+ * @static
  * @package     Faq
  * @subpackage  com_faq
  * @since       2.5
@@ -25,16 +26,17 @@ abstract class FaqHelperRoute
 	protected static $lookup;
 
 	/**
-	 * Get the faq route
+	 * Method to get a route configuration for the faq view.
 	 *
-	 * @param   int  $id     The route of the faq.
-	 * @param   int  $catid  The id of the category.
+	 * @param   int    $id       The route of the faq.
+	 * @param   int    $catid    The id of the category.
+	 * @param   string $language The language of the application.
 	 *
 	 * @return  string
 	 *
 	 * @since   2.5
 	 */
-	public static function getFaqRoute($id, $catid = 0, $language = 0)
+	public static function getFaqRoute($id, $catid = 0, $language = '')
 	{
 		$needles = array(
 			'faq' => array((int) $id)
@@ -50,7 +52,6 @@ abstract class FaqHelperRoute
 
 			if ($category)
 			{
-				// TODO Throw error that the category either not exists or is unpublished
 				$needles['category'] = array_reverse($category->getPath());
 				$needles['categories'] = $needles['category'];
 				$link .= '&catid=' . $catid;
@@ -89,7 +90,36 @@ abstract class FaqHelperRoute
 	}
 
 	/**
-	 * Get the category route
+	 * Method to get a route configuration for the form view.
+	 *
+	 * @param   int  $id  The id of the form.
+	 *
+	 * @return  string
+	 *
+	 * @since   2.5
+	 */
+	public static function getFormRoute($id, $return = null)
+	{
+		// Create the link
+		if ($id)
+		{
+			$link = 'index.php?option=com_faq&task=faq.edit&f_id=' . $id;
+		}
+		else
+		{
+			$link = 'index.php?option=com_faq&task=faq.edit&f_id=0';
+		}
+
+		if ($return)
+		{
+			$link .= '&return=' . $return;
+		}
+
+		return $link;
+	}
+
+	/**
+	 * Method to get a route configuration for the category view.
 	 *
 	 * @param   int  $catid  The id of the category.
 	 *
@@ -153,33 +183,9 @@ abstract class FaqHelperRoute
 	}
 
 	/**
-	 * Get the Form route
+	 * Method to find the item.
 	 *
-	 * @param   int  $id  The id of the form.
-	 *
-	 * @return  string
-	 *
-	 * @since   2.5
-	 */
-	public static function getFormRoute($id)
-	{
-		// Create the link
-		if ($id)
-		{
-			$link = 'index.php?option=com_faq&task=faq.edit&f_id=' . $id;
-		}
-		else
-		{
-			$link = 'index.php?option=com_faq&task=faq.edit&f_id=0';
-		}
-
-		return $link;
-	}
-
-	/**
-	 * Find the item
-	 *
-	 * @param   boleam  $needles  The needles.
+	 * @param   boleam  $needles  The needles to find.
 	 *
 	 * @return  void
 	 *
@@ -235,7 +241,7 @@ abstract class FaqHelperRoute
 		else
 		{
 			$active = $menus->getActive();
-			if ($active && $active->component == 'com_faq')
+			if ($active)
 			{
 				return $active->id;
 			}

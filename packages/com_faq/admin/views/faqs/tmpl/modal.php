@@ -9,27 +9,21 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-// Get document
-$doc = JFactory::getDocument();
-$doc->setTitle(JText::_('COM_FAQ_FAQS_TITLE'));
-$doc->addStyleSheet(JURI::root() . 'media/com_faq/css/backend.css');
+if (JFactory::getApplication()->isSite())
+{
+	JSession::checkToken('get') or die(JText::_('JINVALID_TOKEN'));
+}
 
-// Include the component HTML helpers.
-JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
+require_once JPATH_ROOT . '/components/com_faq/helpers/route.php';
 
-// Load the tooltip behavior.
+JHtml::addIncludePath(JPATH_COMPONENT.'/helpers/html');
 JHtml::_('behavior.tooltip');
-JHtml::_('behavior.multiselect');
 
-// Initialise variables.
-$user      = JFactory::getUser();
-$userId    = $user->get('id');
-$listOrder = $this->escape($this->state->get('list.ordering'));
-$listDirn  = $this->escape($this->state->get('list.direction'));
-$canOrder  = $user->authorise('core.edit.state', 'com_faq.category');
-$saveOrder = $listOrder == 'a.ordering';
+$function	= JRequest::getCmd('function', 'jSelectFaq');
+$listOrder	= $this->escape($this->state->get('list.ordering'));
+$listDirn	= $this->escape($this->state->get('list.direction'));
 ?>
-<form action="<?php echo JRoute::_('index.php?option=com_faq&view=faqs'); ?>" method="post" name="adminForm" id="adminForm">
+<form action="<?php echo JRoute::_('index.php?option=com_faq&view=faqs&layout=modal&tmpl=component&function=' . $function . '&' . JSession::getFormToken() . '=1');?>" method="post" name="adminForm" id="adminForm">
 	<fieldset id="filter-bar">
 		<div class="filter-search fltlft">
 			<label class="filter-search-lbl" for="filter_search"><?php echo JText::_('JSEARCH_FILTER_LABEL'); ?></label>
@@ -56,13 +50,9 @@ $saveOrder = $listOrder == 'a.ordering';
 			</select>
 		</div>
 	</fieldset>
-	<div class="clr"></div>
 	<table class="adminlist">
 		<thead>
 			<tr>
-				<th width="1%">
-					<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
-				</th>
 				<th class="title">
 					<?php echo JHtml::_('grid.sort', 'COM_FAQ_HEADING_TITLE', 'a.title', $listDirn, $listOrder); ?>
 				</th>
@@ -72,17 +62,14 @@ $saveOrder = $listOrder == 'a.ordering';
 				<th class="nowrap" width="10%">
 					<?php echo JHtml::_('grid.sort', 'JCATEGORY', 'category_title', $listDirn, $listOrder); ?>
 				</th>
-				<th class="nowrap" width="10%">
-					<?php echo JHtml::_('grid.sort',  'JGRID_HEADING_ORDERING', 'a.ordering', $listDirn, $listOrder); ?>
-					<?php if ($canOrder && $saveOrder): ?>
-						<?php echo JHtml::_('grid.order', $this->items, 'filesave.png', 'faqs.saveorder'); ?>
-					<?php endif; ?>
-				</th>
 				<th width="5%">
 					<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_ACCESS', 'a.access', $listDirn, $listOrder); ?>
 				</th>
 				<th width="5%">
 					<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'a.language', $listDirn, $listOrder); ?>
+				</th>
+				<th width="5%">
+					<?php echo JHtml::_('grid.sort',  'JDATE', 'a.created', $listDirn, $listOrder); ?>
 				</th>
 				<th class="nowrap" width="1%">
 					<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
@@ -91,76 +78,66 @@ $saveOrder = $listOrder == 'a.ordering';
 		</thead>
 		<tfoot>
 			<tr>
-				<td colspan="8">
+				<td colspan="7">
 					<?php echo $this->pagination->getListFooter(); ?>
 				</td>
 			</tr>
 		</tfoot>
 		<tbody>
-		<?php foreach ($this->items as $i => $item):
-			$ordering   = $listOrder == 'a.ordering';
-			$canCreate  = $user->authorise('core.create', 'com_faq.category.' . $item->catid);
-			$canEdit    = $user->authorise('core.edit', 'com_faq.category.' . $item->catid);
-			$canCheckin = $user->authorise('core.manage', 'com_checkin') || $item->checked_out == $userId || $item->checked_out == 0;
-			$canChange  = $user->authorise('core.edit.state', 'com_faq.category.' . $item->catid) && $canCheckin;
+			<?php foreach ($this->items as $i => $item) : ?>
+				<?php if ($item->language && JLanguageMultilang::isEnabled())
+				{
+					$tag = strlen($item->language);
+					if ($tag == 5)
+					{
+						$lang = substr($item->language, 0, 2);
+					}
+					elseif ($tag == 6)
+					{
+						$lang = substr($item->language, 0, 3);
+					}
+					else
+					{
+						$lang = "";
+					}
+				}
+				elseif (!JLanguageMultilang::isEnabled())
+				{
+					$lang = "";
+				}
 			?>
 			<tr class="row<?php echo $i % 2; ?>">
-				<td class="center">
-					<?php echo JHtml::_('grid.id', $i, $item->id); ?>
-				</td>
 				<td>
-					<?php if ($item->checked_out): ?>
-						<?php echo JHtml::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'faqs.', $canCheckin); ?>
-					<?php endif; ?>
-					<?php if ($canEdit): ?>
-						<a href="<?php echo JRoute::_('index.php?option=com_faq&task=faq.edit&id=' . (int) $item->id); ?>">
-							<?php echo $this->escape($item->title); ?></a>
-					<?php else: ?>
-							<?php echo $this->escape($item->title); ?>
-					<?php endif; ?>
-					<p class="smallsub">
-						<?php echo JText::sprintf('JGLOBAL_LIST_ALIAS', $this->escape($item->alias)); ?></p>
+					<a class="pointer" onclick="if (window.parent) window.parent.<?php echo $this->escape($function);?>('<?php echo $item->id; ?>', '<?php echo $this->escape(addslashes($item->title)); ?>', '<?php echo $this->escape($item->catid); ?>', null, '<?php echo $this->escape(FaqHelperRoute::getFaqRoute($item->id, $item->catid, $item->language)); ?>', '<?php echo $this->escape($lang); ?>', null);">
+						<?php echo $this->escape($item->title); ?></a>
 				</td>
 				<td class="center">
-					<?php echo JHtml::_('jgrid.published', $item->published, $i, 'faqs.', $canChange, 'cb', $item->publish_up, $item->publish_down); ?>
+					<?php echo JHtml::_('jgrid.published', $item->published, $i, 'faqs.', false); ?>
 				</td>
 				<td class="center">
 					<?php echo $this->escape($item->category_title); ?>
-				</td>
-				<td class="order">
-					<?php if ($canChange): ?>
-						<?php if ($saveOrder): ?>
-							<?php if ($listDirn == 'asc'): ?>
-								<span><?php echo $this->pagination->orderUpIcon($i, (@$this->items[$i - 1]->catid == $item->catid), 'faqs.orderup', 'JLIB_HTML_MOVE_UP', $ordering); ?></span>
-								<span><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, (@$this->items[$i + 1]->catid == $item->catid), 'faqs.orderdown', 'JLIB_HTML_MOVE_DOWN', $ordering); ?></span>
-							<?php elseif ($listDirn == 'desc'): ?>
-								<span><?php echo $this->pagination->orderUpIcon($i, (@$this->items[$i - 1]->catid == $item->catid), 'faqs.orderdown', 'JLIB_HTML_MOVE_UP', $ordering); ?></span>
-								<span><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, (@$this->items[$i + 1]->catid == $item->catid), 'faqs.orderup', 'JLIB_HTML_MOVE_DOWN', $ordering); ?></span>
-							<?php endif; ?>
-						<?php endif; ?>
-						<?php $disabled = $saveOrder ?  '' : 'disabled="disabled"'; ?>
-						<input type="text" name="order[]" size="5" value="<?php echo $item->ordering; ?>" <?php echo $disabled; ?> class="text-area-order" />
-					<?php else: ?>
-						<?php echo $item->ordering; ?>
-					<?php endif; ?>
 				</td>
 				<td class="center">
 					<?php echo $this->escape($item->access_level); ?>
 				</td>
 				<td class="center">
-					<?php if ($item->language == '*'): ?>
+					<?php if ($item->language=='*'):?>
 						<?php echo JText::alt('JALL', 'language'); ?>
-					<?php else: ?>
+					<?php else:?>
 						<?php echo $item->language_title ? $this->escape($item->language_title) : JText::_('JUNDEFINED'); ?>
-					<?php endif; ?>
+					<?php endif;?>
+				</td>
+				<td class="center nowrap">
+					<?php echo JHtml::_('date', $item->created, JText::_('DATE_FORMAT_MK')); ?>
 				</td>
 				<td class="center">
-					<?php echo $item->id; ?>
+					<?php echo (int) $item->id; ?>
 				</td>
-			</tr>
+				</tr>
 			<?php endforeach; ?>
 		</tbody>
 	</table>
+
 	<div>
 		<input type="hidden" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />

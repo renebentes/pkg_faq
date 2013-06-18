@@ -53,7 +53,7 @@ class FaqControllerFaq extends JControllerForm
 	{
 		// Initialise variables.
 		$user       = JFactory::getUser();
-		$categoryId = JArrayHelper::getValue($data, 'catid', JRequest::getInt('catid'), 'int');
+		$categoryId = JArrayHelper::getValue($data, 'catid', $this->input->getInt('id'), 'int');
 		$allow      = null;
 
 		if ($categoryId)
@@ -85,46 +85,24 @@ class FaqControllerFaq extends JControllerForm
 	 */
 	protected function allowEdit($data = array(), $key = 'id')
 	{
-		// Initialise variables.
-		$recordId = (int) isset($data[$key]) ? $data[$key] : 0;
-		$user     = JFactory::getUser();
-		$userId   = $user->get('id');
-		$asset    = 'com_faq.faq.' . $recordId;
+		$recordId   = (int) isset($data[$key]) ? $data[$key] : 0;
+		$categoryId = 0;
 
-		// Check general edit permission first.
-		if ($user->authorise('core.edit', $asset))
+		if ($recordId)
 		{
-			return true;
+			$categoryId = (int) $this->getModel()->getItem($recordId)->catid;
 		}
 
-		// Fallback on edit.own.
-		// First test if the permission is available.
-		if ($user->authorise('core.edit.own', $asset))
+		if ($categoryId)
 		{
-			// Now test the owner is the user.
-			$ownerId = (int) isset($data['created_by']) ? $data['created_by'] : 0;
-			if (empty($ownerId) && $recordId)
-			{
-				// Need to do a lookup from the model.
-				$record = $this->getModel()->getItem($recordId);
-
-				if (empty($record))
-				{
-					return false;
-				}
-
-				$ownerId = $record->created_by;
-			}
-
-			// If the owner matches 'me' then do the test.
-			if ($ownerId == $userId)
-			{
-				return true;
-			}
+			// The category has been set. Check the category permissions.
+			return JFactory::getUser()->authorise('core.edit', $this->option . '.category.' . $categoryId);
 		}
-
-		// Since there is no asset tracking, revert to the component permissions.
-		return parent::allowEdit($data, $key);
+		else
+		{
+			// Since there is no asset tracking, revert to the component permissions.
+			return parent::allowEdit($data, $key);
+		}
 	}
 
 	/**
@@ -172,7 +150,7 @@ class FaqControllerFaq extends JControllerForm
 	 *
 	 * @since   2.5
 	 */
-	public function getModel($name = 'Form', $prefix = '', $config = array('ignore_request' => true))
+	public function getModel($name = 'Form', $prefix = 'FaqModel', $config = array('ignore_request' => true))
 	{
 		$model = parent::getModel($name, $prefix, $config);
 
@@ -191,32 +169,13 @@ class FaqControllerFaq extends JControllerForm
 	 */
 	protected function getRedirectToItemAppend($recordId = null, $urlVar = 'f_id')
 	{
-		// Need to override the parent method completely.
-		$tmpl   = JRequest::getCmd('tmpl');
-		$layout = JRequest::getCmd('layout', 'edit');
-		$append = '';
-
-		// Setup redirect info.
-		if ($tmpl)
-		{
-			$append .= '&tmpl=' . $tmpl;
-		}
-
-		$append .= '&layout=edit';
-
-		if ($recordId)
-		{
-			$append .= '&' . $urlVar . '=' . $recordId;
-		}
+		$append = parent::getRedirectToItemAppend($recordId, $urlVar);
+		$itemId = JRequest::getInt('Itemid');
+		$return = $this->getReturnPage();
 
 		if ($itemId)
 		{
 			$append .= '&Itemid=' . $itemId;
-		}
-
-		if($catId)
-		{
-			$append .= '&catid=' . $catId;
 		}
 
 		if ($return)
@@ -260,7 +219,7 @@ class FaqControllerFaq extends JControllerForm
 	 *
 	 * @since   2.5
 	 */
-	protected function postSaveHook(JModel &$model, $validData = array())
+	protected function postSaveHook(JModelLegacy $model, $validData = array())
 	{
 		$task = $this->getTask();
 

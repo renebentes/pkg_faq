@@ -40,12 +40,11 @@ class FaqViewFaq extends JViewLegacy
 		$app        = JFactory::getApplication();
 		$user       = JFactory::getUser();
 		$userId     = $user->get('id');
-		$dispatcher = JDispatcher::getInstance();
 
 		// Get view related request variables.
+		$this->item  = $this->get('Item');
 		$this->print = JRequest::getBool('print');
 		$this->state = $this->get('State');
-		$this->item  = $this->get('Item');
 		$this->user  = $user;
 
 		// Check for errors.
@@ -75,7 +74,7 @@ class FaqViewFaq extends JViewLegacy
 		{
 			$currentLink = $active->link;
 			// If the current view is the active item and an faq view for this faq, then the menu item params take priority
-			if (strpos($currentLink, 'view=faq') && (strpos($currentLink, '&id='.(string) $item->id)))
+			if (strpos($currentLink, 'view=faq') && (strpos($currentLink, '&id=' . (string) $item->id)))
 			{
 				// $item->params are the faq params, $temp are the menu item params
 				// Merge so that the menu item params take priority
@@ -119,7 +118,6 @@ class FaqViewFaq extends JViewLegacy
 		if ($item->params->get('access-view') != true && (($item->params->get('show_noauth') != true && $user->get('guest'))))
 		{
 			JError::raiseWarning(403, JText::_('JERROR_ALERTNOAUTHOR'));
-
 			return;
 
 		}
@@ -147,6 +145,7 @@ class FaqViewFaq extends JViewLegacy
 	 */
 	protected function _prepareDocument()
 	{
+		// Initialiase variables.
 		$app     = JFactory::getApplication();
 		$menus   = $app->getMenu();
 		$pathway = $app->getPathway();
@@ -194,6 +193,7 @@ class FaqViewFaq extends JViewLegacy
 			}
 		}
 
+		// Check for empty title and add site name if param is set
 		if (empty($title))
 		{
 			$title = $app->getCfg('sitename');

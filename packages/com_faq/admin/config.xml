@@ -1,10 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
-	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
-		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" class="inputbox" filter="rules" validate="rules" component="com_faq" section="component" />
+	<fieldset name="basic" label="COM_FAQ_FAQS_SETTINGS_LABEL" description="COM_FAQ_FAQS_SETTINGS_DESC">
+		<field name="show_category" type="radio" label="JGLOBAL_SHOW_CATEGORY_LABEL" description="COM_FAQ_SHOW_CATEGORY_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="link_category" type="radio" label="JGLOBAL_LINK_CATEGORY_LABEL" description="COM_FAQ_LINK_CATEGORY_DESC" default="1">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+
+		<field name="show_parent_category" type="radio" label="JGLOBAL_SHOW_PARENT_CATEGORY_LABEL" description="COM_FAQ_SHOW_PARENT_CATEGORY_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="link_parent_category" type="radio" label="JGLOBAL_LINK_PARENT_CATEGORY_LABEL" description="COM_FAQ_LINK_PARENT_CATEGORY_DESC" default="1">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+
+		<field name="show_author" type="radio" label="JGLOBAL_SHOW_AUTHOR_LABEL" description="COM_FAQ_SHOW_AUTHOR_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="link_author" type="radio" label="JGLOBAL_LINK_AUTHOR_LABEL" description="COM_FAQ_LINK_AUTHOR_DESC" default="0">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+
+		<field name="show_create_date" type="radio" label="JGLOBAL_SHOW_CREATE_DATE_LABEL" description="COM_FAQ_SHOW_CREATE_DATE_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="show_modify_date" type="radio" label="JGLOBAL_SHOW_MODIFY_DATE_LABEL" description="COM_FAQ_SHOW_MODIFY_DATE_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="show_publish_date" type="radio" label="JGLOBAL_SHOW_PUBLISH_DATE_LABEL" description="COM_FAQ_SHOW_PUBLISH_DATE_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="show_icons" type="radio" label="JGLOBAL_SHOW_ICONS_LABEL" description="COM_FAQ_SHOW_ICONS_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="show_print_icon" type="radio" label="JGLOBAL_SHOW_PRINT_ICON_LABEL" description="COM_FAQ_SHOW_PRINT_ICON_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="show_email_icon" type="radio" label="JGLOBAL_SHOW_EMAIL_ICON_LABEL" description="COM_FAQ_SHOW_EMAIL_ICON_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
+
+		<field name="show_hits" type="radio" label="JGLOBAL_SHOW_HITS_LABEL" description="COM_FAQ_SHOW_HITS_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
 	</fieldset>
 
-	<fieldset name="category" label="JCATEGORY" description="COM_FAQ_CATEGORY_SETTINGS_DESC">
+	<fieldset name="category" label="COM_FAQ_CATEGORY_SETTINGS_LABEL" description="COM_FAQ_CATEGORY_SETTINGS_DESC">
 		<field name="show_category_title" type="radio" label="JGLOBAL_SHOW_CATEGORY_TITLE" description="JGLOBAL_SHOW_CATEGORY_TITLE_DESC" default="1">
 			<option value="0">JHIDE</option>
 			<option value="1">JSHOW</option>
@@ -56,8 +119,7 @@
 		</field>
 	</fieldset>
 
-	<fieldset name="list_paramenters" label="JGLOBAL_LIST_LAYOUT_OPTIONS" description="COM_FAQ_LIST_SETTINGS_DESC">
-
+	<fieldset name="list_parameters" label="JGLOBAL_LIST_LAYOUT_OPTIONS" description="COM_FAQ_LIST_SETTINGS_DESC">
 		<field name="display_num" type="list" label="COM_FAQ_NUMBER_ITEMS_LIST_LABEL" description="COM_FAQ_NUMBER_ITEMS_LIST_DESC" default="20">
 			<option value="5">J5</option>
 			<option value="10">J10</option>
@@ -70,7 +132,7 @@
 			<option value="0">JALL</option>
 		</field>
 
-		<field name="show_pagination" type="radio" label="JGLOBAL_PAGINATION_LABEL" description="JGLOBAL_PAGINATION_DESC" default="1">
+		<field name="show_pagination" type="radio" label="JGLOBAL_PAGINATION_LABEL" description="COM_FAQ_PAGINATION_DESC" default="1">
 			<option value="0">JHIDE</option>
 			<option value="1">JSHOW</option>
 			<option value="2">JGLOBAL_AUTO</option>
@@ -80,5 +142,9 @@
 			<option value="0">JHIDE</option>
 			<option value="1">JSHOW</option>
 		</field>
+	</fieldset>
+
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" class="inputbox" filter="rules" validate="rules" component="com_faq" section="component" />
 	</fieldset>
 </config>

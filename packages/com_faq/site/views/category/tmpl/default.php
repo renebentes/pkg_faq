@@ -49,13 +49,13 @@ $doc->addStyleSheet(JURI::root() . 'media/com_faq/css/frontend.css');
 					<form>
 						<div class="row-fluid">
 							<div class="span6">
-								<input type="text" class="input-block-level" placeholder="Type your name...">
+								<input type="text" class="input-block-level" placeholder="<?php echo JText::_('COM_FAQ_FIELD_NAME_INFO'); ?>">
 							</div>
 							<div class="span6">
-								<input type="email" class="input-block-level" placeholder="Type your email...">
+								<input type="email" class="input-block-level" placeholder="<?php echo JText::_('COM_FAQ_FIELD_EMAIL_INFO'); ?>">
 							</div>
 						</div>
-						<textarea rows="3" class="input-block-level" placeholder="Type your question"></textarea>
+						<textarea rows="3" class="input-block-level" placeholder="<?php echo JText::_('COM_FAQ_FIELD_TITLE_INFO'); ?>"></textarea>
 						<div class="row-fluid">
 							<div class="span6">
 								<button type="submit" class="btn"><i class="icon-chevron-right"></i> Send Question</button>

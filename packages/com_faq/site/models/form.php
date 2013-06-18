@@ -56,7 +56,7 @@ class FaqModelForm extends FaqModelFaq
 	 *
 	 * @param	integer	The id of the faq.
 	 *
-	 * @return	mixed	Content item data object on success, false on failure.
+	 * @return	mixed	Faq item data object on success, false on failure.
 	 */
 	public function getItem($itemId = null)
 	{

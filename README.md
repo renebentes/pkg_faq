@@ -37,6 +37,9 @@ Release Notes
 	! Relevant Message
 
 ######1.4
+	+ Visualização de uma única FAQ
+	* Correção na geração de links para plugin de pesquisa
+	+ Plugin para pesquisa de FAQs
 	+ Formulário para envio de perguntas na visualização de lista por categoria
 	+ Campos no banco de dados
 ######1.3

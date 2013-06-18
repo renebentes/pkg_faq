@@ -32,18 +32,15 @@ class FaqController extends JControllerLegacy
 	{
 		// Initialise variables.
 		$cachable = true;
+		$user = JFactory::getUser();
 
 		// Set the default view name and format from the Request.
 		// Note we are using f_id to avoid collisions with the router and the return page.
-		// Frontend is a bit messier than the backend.
 		$id    = JRequest::getInt('f_id');
 		$vName = JRequest::getCmd('view', 'categories');
-
 		JRequest::setVar('view', $vName);
 
-
-		$user = JFactory::getUser();
-		if ($user->get('id') || ($_SERVER['REQUEST_METHOD'] == 'POST' && $vName = 'category'))
+		if ($user->get('id') || ($_SERVER['REQUEST_METHOD'] == 'POST' && $vName = 'categories'))
 		{
 			$cachable = false;
 		}

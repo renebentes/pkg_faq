@@ -68,6 +68,11 @@ class FaqViewCategory extends JViewLegacy
 			return JError::raiseError(404, JText::_('JGLOBAL_CATEGORY_NOT_FOUND'));
 		}
 
+		// Setup the category parameters.
+		$cparams = $category->getParams();
+		$category->params = clone($params);
+		$category->params->merge($cparams);
+
 		// Check whether category access level allows access.
 		$user   = JFactory::getUser();
 		$groups = $user->getAuthorisedViewLevels();
@@ -83,12 +88,6 @@ class FaqViewCategory extends JViewLegacy
 		{
 			$item = &$items[$i];
 			$item->slug = $item->alias ? ($item->id . ':' . $item->alias) : $item->id;
-			$item->catslug = $item->category_alias ? ($item->catid . ':' . $item->category_alias) : $item->catid;
-
-			$temp		= new JRegistry();
-			$temp->loadString($item->params);
-			$item->params = clone($params);
-			$item->params->merge($temp);
 
 			// No link for ROOT category
 			if ($item->parent_alias == 'root')
@@ -96,11 +95,6 @@ class FaqViewCategory extends JViewLegacy
 				$item->parent_slug = null;
 			}
 		}
-
-		// Setup the category parameters.
-		$cparams = $category->getParams();
-		$category->params = clone($params);
-		$category->params->merge($cparams);
 
 		// Check for layout override only if this is not the active menu item
 		// If it is the active menu item, then the view and category id will match

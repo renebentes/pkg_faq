@@ -9,10 +9,6 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-// Component Helper
-jimport('joomla.application.component.helper');
-jimport('joomla.application.categories');
-
 /**
  * Faq Component Category Tree
  *
@@ -36,6 +32,7 @@ class FaqCategories extends JCategories
 		$options['table'] = '#__faq';
 		$options['extension'] = 'com_faq';
 		$options['statefield'] = 'published';
+		$options['countItems'] = 1;
 
 		parent::__construct($options);
 	}

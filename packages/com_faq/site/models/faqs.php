@@ -48,8 +48,7 @@ class FaqModelFaqs extends JModelList
 				'checked_out', 'a.checked_out',
 				'checked_out_time', 'a.checked_out_time',
 				'publish_up', 'a.publish_up',
-				'publish_down', 'a.publish_down',
-				'author', 'a.author'
+				'publish_down', 'a.publish_down'
 			);
 		}
 
@@ -323,8 +322,8 @@ class FaqModelFaqs extends JModelList
 		// Filter by language
 		if ($this->getState('filter.language'))
 		{
-			$query->where('a.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ')');
-			$query->where('(contact.language IN (' . $db->Quote(JFactory::getLanguage()->getTag()) . ',' . $db->Quote('*') . ') OR contact.language IS NULL)');
+			$query->where('a.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
+			$query->where('(contact.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ') OR contact.language IS NULL)');
 		}
 
 		// Add the list ordering clause.

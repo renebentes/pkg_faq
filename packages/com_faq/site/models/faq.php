@@ -99,7 +99,7 @@ class FaqModelFaq extends JModelItem
 					// use created if modified is 0
 					'CASE WHEN a.modified = 0 THEN a.created ELSE a.modified END AS modified, ' .
 					'a.modified_by, a.checked_out, a.checked_out_time, a.publish_up, a.publish_down, ' .
-					'a.version, a.parentid, a.ordering, a.metakey, a.metadesc, a.access, a.hits, ' .
+					'a.params, a.version, a.ordering, a.metakey, a.metadesc, a.access, a.hits, ' .
 					'a.metadata, a.language'
 					)
 				);
@@ -182,6 +182,7 @@ class FaqModelFaq extends JModelItem
 				// Convert parameter fields to objects.
 				$registry = new JRegistry;
 				$registry->loadString($data->params);
+
 				$data->params = clone $this->getState('params');
 				$data->params->merge($registry);
 
@@ -223,6 +224,7 @@ class FaqModelFaq extends JModelItem
 				else
 				{
 					// If no access filter is set, the layout takes some responsibility for display of limited information.
+					$user = JFactory::getUser();
 					$groups = $user->getAuthorisedViewLevels();
 
 					if ($data->catid == 0 || $data->category_access === null)

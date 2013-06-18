@@ -325,7 +325,7 @@ class FaqModelCategory extends JModelList
 
 				// TODO: Why aren't we lazy loading the children and siblings?
 				$this->_children = $this->_item->getChildren();
-				$this->_parent = false;
+				$this->_parent   = false;
 
 				if ($this->_item->getParent())
 				{
@@ -333,12 +333,12 @@ class FaqModelCategory extends JModelList
 				}
 
 				$this->_rightsibling = $this->_item->getSibling();
-				$this->_leftsibling = $this->_item->getSibling(false);
+				$this->_leftsibling  = $this->_item->getSibling(false);
 			}
 			else
 			{
 				$this->_children = false;
-				$this->_parent = false;
+				$this->_parent   = false;
 			}
 		}
 
