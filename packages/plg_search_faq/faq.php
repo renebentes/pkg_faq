@@ -224,10 +224,7 @@ class plgSearchFaq extends JPlugin
 				foreach($list as $key => $item)
 				{
 					$list[$key]->href = FaqHelperRoute::getFaqRoute($item->slug, $item->catslug);
-				}
 
-				foreach ($list as $key => $item)
-				{
 					if (searchHelper::checkNoHTML($item, $searchText, array('text', 'title', 'metadesk', 'metakey')))
 					{
 						$return[] = $item;

@@ -37,7 +37,7 @@ class JHtmlIcon
 
 		if ($params->get('show_icons'))
 		{
-			$text = '<i class="icon-plus icon-white"></i> ' . JText::_('JNEW');
+			$text = '<i class="icon-plus icon-white"></i>';
 		}
 		else
 		{
@@ -76,18 +76,18 @@ class JHtmlIcon
 
 		if ($params->get('show_icons'))
 		{
-			$text = '<i class="icon-envelope"></i> ' . JText::_('JGLOBAL_EMAIL');
+			$text                           = '<i class="icon-envelope"></i>';
+			$attribs['rel']                 = 'tooltip';
+			$attribs['class']               = 'hasTooltip';
+			$attribs['data-placement']      = 'right';
+			$attribs['data-original-title'] = JText::_('JGLOBAL_EMAIL');
 		}
 		else
 		{
 			$text = JText::_('JGLOBAL_EMAIL');
 		}
 
-		$attribs['rel']                 = 'tooltip';
-		$attribs['class']               = 'hasTooltip';
-		$attribs['data-placement']      = 'right';
-		$attribs['data-original-title'] = JText::_('JGLOBAL_EMAIL');
-		$attribs['onclick']             = "window.open(this.href,'win2','" . $status . "'); return false;";
+		$attribs['onclick'] = "window.open(this.href,'win2','" . $status . "'); return false;";
 
 		$output = JHtml::_('link', JRoute::_($url), $text, $attribs);
 		return $output;
@@ -182,18 +182,18 @@ class JHtmlIcon
 		// checks template image directory for image, if non found default are loaded
 		if ($params->get('show_icons'))
 		{
-			$text = '<i class="icon-print"></i> ' . JText::_('JGLOBAL_PRINT');
+			$text                           = '<i class="icon-print"></i>';
+			$attribs['rel']                 = 'tooltip';
+			$attribs['class']               = 'hasTooltip';
+			$attribs['data-placement']      = 'right';
+			$attribs['data-original-title'] = JText::_('JGLOBAL_PRINT');
 		}
 		else
 		{
 			$text = JText::_('JGLOBAL_PRINT');
 		}
 
-		$attribs['rel']                 = 'tooltip';
-		$attribs['class']               = 'hasTooltip';
-		$attribs['data-placement']      = 'right';
-		$attribs['data-original-title'] = JText::_('JGLOBAL_PRINT');
-		$attribs['onclick']             = "window.open(this.href,'win2','" . $status . "'); return false;";
+		$attribs['onclick'] = "window.open(this.href,'win2','" . $status . "'); return false;";
 
 		return JHtml::_('link', JRoute::_($url), $text, $attribs);
 	}
@@ -215,18 +215,18 @@ class JHtmlIcon
 		// checks template image directory for image, if non found default are loaded
 		if ($params->get('show_icons'))
 		{
-			$text = '<i class="icon-print"></i> ' . JText::_('JGLOBAL_PRINT');
+			$text                           = '<i class="icon-print"></i>';
+			$attribs['rel']                 = 'tooltip';
+			$attribs['class']               = 'hasTooltip';
+			$attribs['data-placement']      = 'right';
+			$attribs['data-original-title'] = JText::_('JGLOBAL_PRINT');
 		}
 		else
 		{
 			$text = JText::_('JGLOBAL_PRINT');
 		}
 
-		$attribs['rel']                 = 'tooltip';
-		$attribs['class']               = 'hasTooltip';
-		$attribs['data-placement']      = 'right';
-		$attribs['data-original-title'] = JText::_('JGLOBAL_PRINT');
-		$attribs['onclick']             = "window.print();return false;";
+		$attribs['onclick'] = "window.print();return false;";
 
 		return JHtml::_('link', '#', $text, $attribs);
 	}

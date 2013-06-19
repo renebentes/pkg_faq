@@ -6,3 +6,32 @@
 .accordion-heading > a:focus {
 	text-decoration: none;
 }
+
+.aside-tools {
+	color: #999;
+}
+
+.item-info {
+	margin: 0;
+	width: 90%;
+}
+
+.item-info-term {
+	display: none;
+}
+
+article aside .btn-group > .dropdown-toggle,
+article aside .btn-group > .dropdown-toggle:hover,
+article aside .btn-group > .dropdown-toggle:active,
+article aside .btn-group > .dropdown-toggle:focus {
+	background: transparent;
+	border: 0;
+	padding: 0;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+}
+
+article aside .actions {
+	min-width: 20px;
+}

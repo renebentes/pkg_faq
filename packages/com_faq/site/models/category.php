@@ -201,7 +201,7 @@ class FaqModelCategory extends JModelList
 		if($this->_records === null && $category = $this->getCategory())
 		{
 			$model = JModelLegacy::getInstance('Faqs', 'FaqModel', array('ignore_request' => true));
-			$model->setState('params', JFactory::getApplication()->getParams());
+			$model->setState('params', $params);
 			$model->setState('filter.category_id', $category->id);
 			$model->setState('filter.published', $this->getState('filter.published'));
 			$model->setState('filter.access', $this->getState('filter.access'));

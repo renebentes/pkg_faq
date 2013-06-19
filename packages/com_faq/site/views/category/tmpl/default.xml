@@ -159,7 +159,7 @@
 		</fieldset>
 
 		<!-- Add params for list layout -->
-		<fieldset name="list" label="JGLOBAL_LIST_LAYOUT_OPTIONS">
+		<fieldset name="list_parameters" label="JGLOBAL_LIST_LAYOUT_OPTIONS">
 			<field name="display_num" type="list" default="10" label="COM_FAQ_NUMBER_ITEMS_LIST_LABEL" description="COM_FAQ_NUMBER_ITEMS_LIST_DESC">
 				<option value="5">J5</option>
 				<option value="10">J10</option>

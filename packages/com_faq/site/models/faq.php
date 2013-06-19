@@ -48,9 +48,18 @@ class FaqModelFaq extends JModelItem
 		$offset = JRequest::getUInt('limitstart', 0);
 		$this->setState('list.offset', $offset);
 
-		// Load the parameters.
+		// Load the parameters. Merge Global and Menu Item params into new object
 		$params = $app->getParams();
-		$this->setState('params', $params);
+		$menuParams = new JRegistry;
+
+		if ($menu = $app->getMenu()->getActive()) {
+			$menuParams->loadString($menu->params);
+		}
+
+		$mergedParams = clone $menuParams;
+		$mergedParams->merge($params);
+
+		$this->setState('params', $mergedParams);
 
 		// Get the user object.
 		$user = JFactory::getUser();
