@@ -19,13 +19,9 @@ defined('_JEXEC') or die;
 class FaqViewCategory extends JViewLegacy
 {
 	protected $state;
-
 	protected $items;
-
 	protected $category;
-
 	protected $children;
-
 	protected $pagination;
 
 	/**
@@ -44,7 +40,7 @@ class FaqViewCategory extends JViewLegacy
 
 		// Get some data from the models
 		$state      = $this->get('State');
-		$params		= $state->params;
+		$params     = $state->params;
 		$items      = $this->get('Items');
 		$category   = $this->get('Category');
 		$children   = $this->get('Children');

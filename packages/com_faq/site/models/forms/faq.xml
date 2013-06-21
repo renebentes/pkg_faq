@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form>
 	<fieldset name="default" label="COM_FAQ_FORM_DEFAULT_LEGEND" addfieldpath="/administrator/components/com_categories/models/fields">
-		<field id="id" name="id" type="hidden" class="inputbox" size="10" default="0" readonly="true" filter="integer" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" />
-		<field id="title" name="title" type="text" class="inputbox" size="30" required="true" label="JGLOBAL_TITLE" description="JFIELD_TITLE_DESC" />
-		<field id="alias" name="alias" type="text" class="inputbox" size="45" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" />
-		<field id="catid" name="catid" type="hidden" class="inputbox" readonly="true" filter="integer" label="JCATEGORY" description="JFIELD_CATEGORY_DESC" />
-		<field id="access" name="access" type="accesslevel" class="inputbox" size="1" label="JFIELD_ACCESS_LABEL" description="JFIELD_ACCESS_DESC" />
-		<field name="language" type="contentlanguage" class="inputbox" label="JFIELD_LANGUAGE_LABEL" description="JFIELD_LANGUAGE_DESC">
-			<option value="*">JALL</option>
-		</field>
-		<field name="description" type="editor" buttons="true" class="inputbox" filter="ContentHelper::filterText" asset_id="com_faq" label="JGLOBAL_DESCRIPTION" description="COM_FAQ_FIELD_DESCRIPTION_DESC" />
-		<field id="created" name="created" type="calendar" filter="unset" />
-		<field id="created_by" name="created_by" type="text" filter="unset" />
-		<field id="created_by_alias" name="created_by_alias" type="text" class="inputbox" size="20" label="JGLOBAL_FIELD_CREATED_BY_ALIAS_LABEL" description="JGLOBAL_FIELD_CREATED_BY_ALIAS_DESC" />
-		<field id="publish_up" name="publish_up" type="calendar" class="inputbox" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" label="JGLOBAL_FIELD_PUBLISH_UP_LABEL" description="JGLOBAL_FIELD_PUBLISH_UP_DESC" />
-		<field id="publish_down" name="publish_down" type="calendar" class="inputbox" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" label="JGLOBAL_FIELD_PUBLISH_DOWN_LABEL" description="JGLOBAL_FIELD_PUBLISH_DOWN_DESC" />
-		<field id="metakey" name="metakey" type="textarea" class="inputbox" rows="5" cols="50" label="JFIELD_META_KEYWORDS_LABEL" description="JFIELD_META_KEYWORDS_DESC" />
-		<field id="metadesc" name="metadesc" type="textarea" class="inputbox" rows="5" cols="50" label="JFIELD_META_DESCRIPTION_LABEL" description="JFIELD_META_DESCRIPTION_DESC" />
+		<field id="title" name="title" type="textarea" class="inputbox input-block-level" rows="3" required="true" label="JGLOBAL_TITLE" description="JFIELD_TITLE_DESC" placeholder="COM_FAQ_FIELD_TITLE_INFO"/>
+		<field id="catid" name="catid" type="hidden" class="inputbox" label="JCATEGORY" description="JFIELD_CATEGORY_DESC" />
+		<field id="published" name="published" type="hidden" class="inputbox" label="JCATEGORY" description="JFIELD_CATEGORY_DESC" default="0"/>
+		<field id="access" name="access" type="hidden" class="inputbox" label="JFIELD_ACCESS_LABEL" description="JFIELD_ACCESS_DESC" default="1"/>
+		<field name="language" type="hidden" class="inputbox" label="JFIELD_LANGUAGE_LABEL" description="JFIELD_LANGUAGE_DESC" default="*"/>
 	</fieldset>
+
+	<fields name="writer">
+		<fieldset name="jwriter" label="COM_FAQ_FIELDSET_WRITER_OPTIONS">
+			<field name="name" type="text" class="inputbox input-block-level" size="50" required="true" label="COM_FAQ_FIELD_NAME_LABEL" description="COM_FAQ_FIELD_NAME_DESC" placeholder="COM_FAQ_FIELD_NAME_INFO"/>
+			<field name="email" type="email" class="inputbox input-block-level" size="50" required="true" label="COM_FAQ_FIELD_EMAIL_LABEL" description="COM_FAQ_FIELD_EMAIL_DESC" placeholder="COM_FAQ_FIELD_EMAIL_INFO"/>
+		</fieldset>
+	</fields>
 </form>

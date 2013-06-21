@@ -66,15 +66,14 @@ class FaqViewFaq extends JViewLegacy
 		// Merge faq params. If this is single-faq view, menu params override faq params
 		// Otherwise, faq params override menu item params
 		$this->params = $this->state->get('params');
-		$active       = $app->getMenu()->getActive();
 		$temp         = clone ($this->params);
 
+		$active = $app->getMenu()->getActive();
 		// Check to see which parameters should take priority
 		if ($active)
 		{
-			$currentLink = $active->link;
 			// If the current view is the active item and an faq view for this faq, then the menu item params take priority
-			if (strpos($currentLink, 'view=faq') && (strpos($currentLink, '&id=' . (string) $item->id)))
+			if (strpos($active->link, 'view=faq') && (strpos($active->link, '&id=' . (string) $item->id)))
 			{
 				// $item->params are the faq params, $temp are the menu item params
 				// Merge so that the menu item params take priority

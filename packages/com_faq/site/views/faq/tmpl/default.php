@@ -144,5 +144,3 @@ JHtml::_('behavior.caption');
 		</section>
 	</article>
 </section>
-
-<?php var_dump($this->params); ?>

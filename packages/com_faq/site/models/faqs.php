@@ -209,7 +209,7 @@ class FaqModelFaqs extends JModelList
 		// Sqlsrv change... aliased c.published to cat_published
 		// Join to check for category published state in parent categories up the tree
 		$query->select('c.published AS cat_published, CASE WHEN badcats.id IS NULL THEN c.published ELSE 0 END AS parents_published');
-		$subquery = 'SELECT cat.id AS id FROM #__categories AS cat JOIN #__categories AS parent ';
+		$subquery = '(SELECT cat.id AS id FROM #__categories AS cat JOIN #__categories AS parent ';
 		$subquery .= 'ON cat.lft BETWEEN parent.lft AND parent.rgt ';
 		$subquery .= 'WHERE parent.extension = ' . $db->quote('com_faq');
 
@@ -217,7 +217,7 @@ class FaqModelFaqs extends JModelList
 		{
 			// Find any up-path categories that are archived
 			// If any up-path categories are archived, include all children in archived layout
-			$subquery .= ' AND parent.published = 2 GROUP BY cat.id ';
+			$subquery .= ' AND parent.published = 2 GROUP BY cat.id)';
 
 			// Set effective state to archived if up-path category is archived
 			$publishedWhere = 'CASE WHEN badcats.id IS NULL THEN a.published ELSE 2 END';
@@ -226,11 +226,11 @@ class FaqModelFaqs extends JModelList
 		{
 			// Find any up-path categories that are not published
 			// If all categories are published, badcats.id will be null, and we just use the Faq state
-			$subquery .= ' AND parent.published != 1 GROUP BY cat.id ';
+			$subquery .= ' AND parent.published != 1 GROUP BY cat.id)';
 			// Select state to unpublished if up-path category is unpublished
 			$publishedWhere = 'CASE WHEN badcats.id IS NULL THEN a.published ELSE 0 END';
 		}
-		$query->join('LEFT OUTER', '(' . $subquery . ') AS badcats ON badcats.id = c.id');
+		$query->join('LEFT OUTER', $subquery . 'AS badcats ON badcats.id = c.id');
 
 		// Filter by access level.
 		if ($access = $this->getState('filter.access')) {
@@ -329,14 +329,14 @@ class FaqModelFaqs extends JModelList
 		// Add the list ordering clause.
 		$query->order($db->escape($this->getState('list.ordering', 'a.ordering')) . ' ' . $db->escape($this->getState('list.direction', 'ASC')));
 
-		$query->group(
+		/*$query->group(
 			'a.id, a.title, a.alias, a.description, a.checked_out, a.checked_out_time, a.catid, ' .
 			'a.created_by, a.created_by_alias, a.created, a.modified, a.modified_by, uam.name, ' .
 			'a.publish_up, a.params, a.images, a.metakey, a.metadesc, a.metadata, a.access, a.hits, ' .
 			'a.published, a.publish_down, badcats.id, c.title, c.path, c.access, c.alias, uam.id, '.
 			'ua.name, ua.email, contact.id, parent.title, parent.id, parent.path, parent.alias, ' .
 			'c.published, c.lft, a.ordering, parent.lft, c.id'
-		);
+		);*/
 
 		return $query;
 	}

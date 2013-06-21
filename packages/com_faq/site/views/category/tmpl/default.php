@@ -36,44 +36,7 @@ $doc->addStyleSheet(JURI::root() . 'media/com_faq/css/frontend.css');
 		</div>
 	<?php endif; ?>
 
-	<div class="accordion" id="accordion1">
-		<div class="accordion-group">
-			<div class="accordion-heading">
-				<a href="#collapseask" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1">
-					<i class="icon-plus"></i>
-					<?php echo JText::_('COM_FAQ_NEW_ASK'); ?>
-				</a>
-			</div>
-			<div id="collapseask" class="accordion-body collapse fade">
-				<div class="accordion-inner">
-					<form>
-						<div class="row-fluid">
-							<div class="span6">
-								<input type="text" class="input-block-level" placeholder="<?php echo JText::_('COM_FAQ_FIELD_NAME_INFO'); ?>">
-							</div>
-							<div class="span6">
-								<input type="email" class="input-block-level" placeholder="<?php echo JText::_('COM_FAQ_FIELD_EMAIL_INFO'); ?>">
-							</div>
-						</div>
-						<textarea rows="3" class="input-block-level" placeholder="<?php echo JText::_('COM_FAQ_FIELD_TITLE_INFO'); ?>"></textarea>
-						<div class="row-fluid">
-							<div class="span6">
-								<button type="submit" class="btn"><i class="icon-chevron-right"></i> Send Question</button>
-							</div>
-							<div class="span6">
-								<div class="pull-right">
-									<div class="form-inline">
-										<label>1 + 1 =</label>
-										<input type="text" class="input-small" placeholder="What result?">
-									</div>
-								</div>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
+	<?php //echo $this->loadTemplate('form'); ?>
 
 	<?php if ($this->params->get('show_description') || ($this->params->get('show_description_image') && $this->category->getParams()->get('image'))) : ?>
 	<div class="category-desc well well-small">

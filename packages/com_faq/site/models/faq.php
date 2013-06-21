@@ -100,27 +100,33 @@ class FaqModelFaq extends JModelItem
 				$query = $db->getQuery(true);
 
 				$query->select($this->getState(
-					'item.select', 'a.id, a.title, a.description, a.alias, ' .
+					'item.select',
+					'a.id, a.title, a.alias, a.description, a.catid, ' .
+					'a.created, a.created_by, a.created_by_alias, ' .
 					// If badcats is not null, this means that the faq is inside an unpublished category
 					// In this case, the state is set to 0 to indicate Unpublished (even if the faq state is Published)
 					'CASE WHEN badcats.id IS NULL THEN a.published ELSE 0 END AS published, ' .
-					'a.catid, a.created, a.created_by, a.created_by_alias, ' .
 					// use created if modified is 0
 					'CASE WHEN a.modified = 0 THEN a.created ELSE a.modified END AS modified, ' .
-					'a.modified_by, a.checked_out, a.checked_out_time, a.publish_up, a.publish_down, ' .
-					'a.params, a.version, a.ordering, a.metakey, a.metadesc, a.access, a.hits, ' .
-					'a.metadata, a.language'
+					'a.modified_by, a.checked_out, a.checked_out_time, uam.name AS modified_by_name, ' .
+					// use created if publish_up is 0
+					'CASE WHEN a.publish_up = 0 THEN a.created ELSE a.publish_up END AS publish_up, ' .
+					'a.publish_down, a.images, a.params, a.version, a.metadata, a.metakey, a.metadesc, ' .
+					'a.access, a.hits, a.language'
 					)
 				);
 				$query->from('#__faq AS a');
 
-				// Join on category table.
-				$query->select('c.title AS category_title, c.alias AS category_alias, c.access AS category_access');
+				// Join over the categories
+				$query->select('c.title AS category_title, c.path AS category_route, c.access AS category_access, c.alias AS category_alias');
 				$query->join('LEFT', '#__categories AS c ON c.id = a.catid');
 
-				// Join on user table.
-				$query->select('u.name AS author');
-				$query->join('LEFT', '#__users AS u ON u.id = a.created_by');
+				// Join over the users for the author and modified_by names.
+				$query->select("CASE WHEN a.created_by_alias > ' ' THEN a.created_by_alias ELSE ua.name END AS author");
+				$query->select("ua.email AS author_email");
+
+				$query->join('LEFT', '#__users AS ua ON ua.id = a.created_by');
+				$query->join('LEFT', '#__users AS uam ON uam.id = a.modified_by');
 
 				// Join on contact table
 				$subQuery = $db->getQuery(true);
@@ -137,11 +143,21 @@ class FaqModelFaq extends JModelItem
 
 				// Join to check for category published state in parent categories up the tree
 				// If all categories are published, badcats.id will be null, and we just use the faq state
+				// Sqlsrv change... aliased c.published to cat_published
+				$query->select('c.published AS cat_published, CASE WHEN badcats.id IS NULL THEN c.published ELSE 0 END AS parents_published');
 				$subquery = ' (SELECT cat.id AS id FROM #__categories AS cat JOIN #__categories AS parent ';
 				$subquery .= 'ON cat.lft BETWEEN parent.lft AND parent.rgt ';
 				$subquery .= 'WHERE parent.extension = ' . $db->quote('com_faq');
 				$subquery .= ' AND parent.published <= 0 GROUP BY cat.id)';
 				$query->join('LEFT OUTER', $subquery . ' AS badcats ON badcats.id = c.id');
+
+				// Filter by access level.
+				if ($access = $this->getState('filter.access')) {
+					$user	= JFactory::getUser();
+					$groups	= implode(',', $user->getAuthorisedViewLevels());
+					$query->where('a.access IN (' . $groups . ')');
+					$query->where('c.access IN (' . $groups . ')');
+				}
 
 				// Filter by language
 				if ($this->getState('filter.language'))
