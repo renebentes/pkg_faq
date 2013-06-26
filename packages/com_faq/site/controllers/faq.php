@@ -251,4 +251,13 @@ class FaqControllerFaq extends JControllerForm
 
 		return $result;
 	}
+
+	public function submit()
+	{
+		// Check for request forgeries.
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		$data = JRequest::get('post');
+		var_dump($data);
+	}
 }

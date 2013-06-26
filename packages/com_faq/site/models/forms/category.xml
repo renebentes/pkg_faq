@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fieldset name="default" label="COM_FAQ_FORM_DEFAULT_LEGEND" addfieldpath="/administrator/components/com_faq/models/fields">
+		<field name="title" type="textarea" class="inputbox input-block-level" rows="3" required="true" label="JGLOBAL_TITLE" description="JFIELD_TITLE_DESC" placeholder="COM_FAQ_FIELD_TITLE_INFO"/>
+		<field name="catid" type="hidden" label="JCATEGORY" description="JFIELD_CATEGORY_DESC" />
+		<field name="published" type="hidden" label="JCATEGORY" description="JFIELD_CATEGORY_DESC" default="0"/>
+		<field name="access" type="hidden" label="JFIELD_ACCESS_LABEL" description="JFIELD_ACCESS_DESC" default="1"/>
+		<field name="language" type="hidden" label="JFIELD_LANGUAGE_LABEL" description="JFIELD_LANGUAGE_DESC" default="*"/>
+	</fieldset>
+
+	<fields name="writer">
+		<fieldset name="jwriter" label="COM_FAQ_FIELDSET_WRITER_OPTIONS">
+			<field name="name" type="text" class="inputbox input-block-level" size="50" required="true" label="COM_FAQ_FIELD_NAME_LABEL" description="COM_FAQ_FIELD_NAME_DESC" placeholder="COM_FAQ_FIELD_NAME_INFO"/>
+			<field name="email" type="email" class="inputbox input-block-level" size="50" required="true" label="COM_FAQ_FIELD_EMAIL_LABEL" description="COM_FAQ_FIELD_EMAIL_DESC" placeholder="COM_FAQ_FIELD_EMAIL_INFO"/>
+		</fieldset>
+	</fields>
+</form>
