@@ -10,7 +10,7 @@
 defined('_JEXEC') or die;
 
 // Base this model on the backend version.
-require_once JPATH_ADMINISTRATOR . '/components/com_faq/models/faq.php';
+require_once JPATH_COMPONENT_ADMINISTRATOR . '/models/faq.php';
 
 /**
  * Faq Component Form Model.
@@ -21,6 +21,30 @@ require_once JPATH_ADMINISTRATOR . '/components/com_faq/models/faq.php';
  */
 class FaqModelForm extends FaqModelFaq
 {
+	/**
+	 * Method to get the record form.
+	 *
+	 * @param   array    $data      Data for the form. [optional]
+	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not. [optional]
+	 *
+	 * @return  mixed  A JForm object on success, false on failure
+	 *
+	 * @since   2.5
+	 */
+	public function getForm($data = array(), $loadData = true)
+	{
+		// Get the form.
+		$view = JRequest::getVar('view');
+		$form = $this->loadForm('com_faq.faq', $view, array('control' => 'jform', 'load_data' => $loadData));
+
+		if (empty($form))
+		{
+			return false;
+		}
+
+		return $form;
+	}
+
 	/**
 	 * Method to auto-populate the model state.
 	 *
@@ -138,5 +162,27 @@ class FaqModelForm extends FaqModelFaq
 	public function getReturnPage()
 	{
 		return base64_encode(urlencode($this->getState('return_page')));
+	}
+
+
+	/**
+	 * Method to increment the hit counter for the faq
+	 *
+	 * @param   int  $id  Optional ID of the faq.
+	 *
+	 * @return  boolean  True on success
+	 *
+	 * @since   2.5
+	 */
+	public function hit($id = 0)
+	{
+		if (empty($id))
+		{
+			$id = $this->getState('faq.id');
+		}
+
+		$table = $this->getTable();
+
+		return $table->hit($id);
 	}
 }

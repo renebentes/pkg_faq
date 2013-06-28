@@ -18,6 +18,7 @@ $doc->addStyleSheet(JURI::root() . 'media/com_faq/css/backend.css');
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 
 // Load the tooltip behavior.
+JHtml::_('behavior.keepalive');
 JHtml::_('behavior.tooltip');
 JHtml::_('behavior.formvalidation');
 
@@ -27,7 +28,7 @@ $canDo = FaqHelper::getActions();
 <script type="text/javascript">
 	Joomla.submitbutton = function(task)
 	{
-		if (task == 'faq.cancel' || document.formvalidator.isValid(document.id('faq-form'))) {
+		if (task == 'faq.cancel' || document.formvalidator.isValid(document.getElementById('faq-form'))) {
 			<?php echo $this->form->getField('description')->save(); ?>
 			Joomla.submitform(task, document.getElementById('faq-form'));
 		}

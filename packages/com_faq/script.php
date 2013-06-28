@@ -34,7 +34,8 @@ class Com_FaqInstallerScript
      */
     private $_obsoletes = array(
         'files' => array(
-            'administrator/components/com_faq/models/fields/faq.php'
+            'administrator/components/com_faq/models/fields/faq.php',
+            'components/com_faq/models/forms/faq.xml'
             ),
         'folders' => array(
             )

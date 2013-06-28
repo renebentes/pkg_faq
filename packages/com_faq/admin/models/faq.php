@@ -78,4 +78,30 @@ class FaqModelFaq extends JModelAdmin
 
 		return $data;
 	}
+
+	/**
+	 * Method to get a single record.
+	 *
+	 * @param   integer  $pk  The id of the primary key.
+	 *
+	 * @return  mixed  Object on success, false on failure.
+	 *
+	 * @since   2.5
+	 */
+	public function getItem($pk = null)
+	{
+		if ($item = parent::getItem($pk))
+		{
+			// Convert the metadata field to an array.
+			$registry = new JRegistry;
+			$registry->loadString($item->metadata);
+			$item->metadata = $registry->toArray();
+
+			$registry = new JRegistry;
+			$registry->loadString($item->writer);
+			$item->writer = $registry->toArray();
+		}
+
+		return $item;
+	}
 }
