@@ -53,7 +53,7 @@ class FaqControllerFaq extends JControllerForm
 	{
 		// Initialise variables.
 		$user       = JFactory::getUser();
-		$categoryId = JArrayHelper::getValue($data, 'catid', $this->input->getInt('id'), 'int');
+		$categoryId = JArrayHelper::getValue($data, 'catid', JRequest::getInt('id'), 'int');
 		$allow      = null;
 
 		if ($categoryId)
@@ -257,7 +257,84 @@ class FaqControllerFaq extends JControllerForm
 		// Check for request forgeries.
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
-		$data = JRequest::get('post');
-		var_dump($data);
+		// Initialise variables.
+		$app     = JFactory::getApplication();
+		$lang    = JFactory::getLanguage();
+		$data    = JRequest::getVar('jform', array(), 'post', 'array');
+		$model   = $this->getModel('Form', 'FaqModel');
+
+		// Validate the posted data.
+		// Sometimes the form needs some posted data, such as for plugins and modules.
+		$form = $model->getForm($data, false);
+
+		if (!$form)
+		{
+			$app->enqueueMessage($model->getError(), 'error');
+
+			return false;
+		}
+
+		// Test whether the data is valid.
+		$validData = $model->validate($form, $data);
+
+		// Check for validation errors.
+		if ($validData === false)
+		{
+			// Get the validation messages.
+			$errors = $model->getErrors();
+
+			// Push up to three validation messages out to the user.
+			for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++)
+			{
+				if ($errors[$i] instanceof Exception)
+				{
+					$app->enqueueMessage($errors[$i]->getMessage(), 'warning');
+				}
+				else
+				{
+					$app->enqueueMessage($errors[$i], 'warning');
+				}
+			}
+
+			// Redirect back to the edit screen.
+			$this->setRedirect(
+				JRoute::_(
+					'index.php?option=' . $this->option . '&view=' . $this->view, false
+				)
+			);
+
+			return false;
+		}
+
+		// Attempt to save the data.
+		if (!$model->save($validData))
+		{
+			// Redirect back to the edit screen.
+			$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_SAVE_FAILED', $model->getError()));
+			$this->setMessage($this->getError(), 'error');
+
+			$this->setRedirect(
+				JRoute::_(
+					'index.php?option=' . $this->option . '&view=' . $this->view, false
+				)
+			);
+
+			return false;
+		}
+
+		$this->setMessage(
+			JText::_(
+				$lang->hasKey($this->text_prefix . '_SUBMIT_SAVE_SUCCESS') ? $this->text_prefix : 'JLIB_APPLICATION' . '_SUBMIT_SAVE_SUCCESS'
+			),
+			'success'
+		);
+
+		$this->setRedirect(
+				JRoute::_(
+					'index.php?option=' . $this->option . '&view=' . $this->view, false
+				)
+			);
+
+		return true;
 	}
 }

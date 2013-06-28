@@ -9,8 +9,6 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.controller');
-
 /**
  * Faq Component Controller
  *
@@ -18,7 +16,7 @@ jimport('joomla.application.component.controller');
  * @subpackage  com_faq
  * @since       2.5
  */
-class FaqController extends JController
+class FaqController extends JControllerLegacy
 {
 	/**
 	 * @var		string	The default view.
@@ -38,15 +36,6 @@ class FaqController extends JController
 	 */
 	public function display($cachable = false, $urlparams = false)
 	{
-		require_once JPATH_COMPONENT . '/helpers/faq.php';
-
-		// Load the submenu.
-		FaqHelper::addSubmenu(JRequest::getCmd('view', 'cpanel'));
-
-		$view   = JRequest::getCmd('view', 'cpanel');
-		$layout = JRequest::getCmd('layout', 'default');
-		$id     = JRequest::getInt('id');
-
 		parent::display();
 
 		return $this;

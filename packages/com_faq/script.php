@@ -19,7 +19,6 @@ jimport('joomla.installer.installer');
  */
 class Com_FaqInstallerScript
 {
-
     /**
      * Extension name
      *
@@ -34,7 +33,9 @@ class Com_FaqInstallerScript
      */
     private $_obsoletes = array(
         'files' => array(
-            'administrator/components/com_faq/models/fields/faq.php'
+            'administrator/components/com_faq/models/fields/faq.php',
+            'administrator/components/com_faq/views/cpanel/tmpl/default_stats.php',
+            'components/com_faq/models/forms/faq.xml'
             ),
         'folders' => array(
             )
@@ -101,6 +102,7 @@ class Com_FaqInstallerScript
      */
     function postflight($type, $parent)
     {
+        $this->_activeModules();
         $this->_removeObsoletes($this->_obsoletes);
     }
 
@@ -147,6 +149,95 @@ class Com_FaqInstallerScript
         }
 
         return true;
+    }
+
+    /**
+     * Method to activate modules in the administrative area
+     */
+
+    private function _activeModules()
+    {
+        // Initialize variables
+        $modules = array('mod_faq_latest', 'mod_faq_popular');
+        $db      = JFactory::getDbo();
+
+        foreach ($modules as $module)
+        {
+            $query = $db->getQuery(true);
+
+            $query->select('id');
+            $query->from($db->quoteName('#__modules'));
+            $query->where('module = \'' . $module . '\'');
+
+            $db->setQuery($query);
+
+            if(version_compare(JVERSION, '3.0', 'ge'))
+            {
+                $ids = $db->loadColumn();
+            }
+            else
+            {
+                $ids = $db->loadResultArray();
+            }
+
+            if(!empty($ids))
+            {
+                try
+                {
+                    $db->transactionStart();
+
+                    foreach ($ids as $id)
+                    {
+                        $query = $db->getQuery(true);
+                        $query->update($db->quoteName('#__modules'));
+                        $query->set(
+                            array(
+                                'position = \'faq-cpanel\'',
+                                'published = 1',
+                                'access = 3',
+                                'params = \'{"count":"5","ordering":"c_dsc","catid":"","user_id":"0","layout":"_:default","moduleclass_sfx":"","cache":"1","cache_time":"900","cachemode":"static"}\''
+                                )
+                            );
+                        $query->where($db->quoteName('id') . ' = ' . $id);
+
+                        $db->setQuery($query);
+                        $db->execute();
+
+                        $query = $db->getQuery(true);
+                        $query->select('*');
+                        $query->from($db->quoteName('#__modules_menu'));
+                        $query->where($db->quoteName('moduleid') . ' = ' . $id);
+
+                        $db->setQuery($query);
+                        if(version_compare(JVERSION, '3.0', 'ge'))
+                        {
+                            $result = $db->loadColumn();
+                        }
+                        else
+                        {
+                            $result = $db->loadResultArray();
+                        }
+
+                        if(empty($result))
+                        {
+                            $query = $db->getQuery(true);
+                            $query->insert($db->quoteName('#__modules_menu'));
+                            $query->columns($db->quoteName(array('moduleid', 'menuid')));
+                            $query->values(implode(',', array($id, 0)));
+
+                            $db->setQuery($query);
+                            $db->execute();
+                        }
+                    }
+
+                    $db->transactionCommit();
+                }
+                catch(Exception $e)
+                {
+                    $db->transactionRollback();
+                }
+            }
+        }
     }
 
     /**
@@ -216,7 +307,7 @@ class Com_FaqInstallerScript
             ->from('#__menu')
             ->where($db->qn('type') . ' = ' . $db->q('component'))
             ->where($db->qn('menutype') . ' = ' . $db->q('main'))
-            ->where($db->qn('link'). ' LIKE ' . $db->q('index.php?option='.$this->_extension));
+            ->where($db->qn('link') . ' LIKE ' . $db->q('index.php?option=' . $this->_extension));
         $db->setQuery($query);
         if(version_compare(JVERSION, '3.0', 'ge'))
         {
@@ -327,7 +418,7 @@ class Com_FaqInstallerScript
         $query->select('id')
             ->from('#__menu')
             ->where($db->qn('type') . ' = ' . $db->q('component'))
-            ->where($db->qn('menutype'). ' = ' . $db->q('main'))
+            ->where($db->qn('menutype') . ' = ' . $db->q('main'))
             ->where($db->qn('link') . ' LIKE ' . $db->q('index.php?option='.$this->_extension . '&%'));
         $db->setQuery($query);
 

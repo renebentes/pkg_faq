@@ -14,7 +14,7 @@
 
 	<!-- Add fields to the parameters object for the layout. -->
 	<fields name="params">
-		<fieldset name="basic" label="COM_FAQ_FAQS_SETTINGS_LABEL" description="COM_FAQS_FAQ_SETTINGS_DESC">
+		<fieldset name="basic" label="COM_FAQ_FAQS_SETTINGS_LABEL">
 			<field name="show_category" type="list" label="JGLOBAL_SHOW_CATEGORY_LABEL" description="COM_FAQS_SHOW_CATEGORY_DESC">
 				<option value="">JGLOBAL_USE_GLOBAL</option>
 				<option value="0">JHIDE</option>
@@ -184,6 +184,10 @@
 				<option value="0">JHIDE</option>
 				<option value="1">JSHOW</option>
 			</field>
+		</fieldset>
+
+		<fieldset name="responsible" label="COM_FAQ_RESPONSIBLE_SETTINGS_LABEL">
+			<field name="created_by" type="user" label="COM_FAQ_FIELD_RESPONSIBLE_LABEL" description="COM_FAQ_FIELD_RESPONSIBLE_DESC" />
 		</fieldset>
 	</fields>
 </metadata>

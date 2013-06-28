@@ -164,6 +164,10 @@ class FaqModelFaqs extends JModelList
 		$query->select('c.title AS category_title');
 		$query->join('LEFT', '#__categories AS c ON c.id = a.catid');
 
+		// Join over the users for the author.
+		$query->select('ua.name AS author_name');
+		$query->join('LEFT', '#__users AS ua ON ua.id = a.created_by');
+
 		// Filter by access level.
 		if ($access = $this->getState('filter.access'))
 		{

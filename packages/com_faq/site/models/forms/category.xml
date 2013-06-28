@@ -3,6 +3,7 @@
 	<fieldset name="default" label="COM_FAQ_FORM_DEFAULT_LEGEND" addfieldpath="/administrator/components/com_faq/models/fields">
 		<field name="title" type="textarea" class="inputbox input-block-level" rows="3" required="true" label="JGLOBAL_TITLE" description="JFIELD_TITLE_DESC" placeholder="COM_FAQ_FIELD_TITLE_INFO"/>
 		<field name="catid" type="hidden" label="JCATEGORY" description="JFIELD_CATEGORY_DESC" />
+		<field name="created_by" type="hidden" label="JGLOBAL_FIELD_CREATED_BY_LABEL" description="JGLOBAL_FIELD_CREATED_BY_DESC"/>
 		<field name="published" type="hidden" label="JCATEGORY" description="JFIELD_CATEGORY_DESC" default="0"/>
 		<field name="access" type="hidden" label="JFIELD_ACCESS_LABEL" description="JFIELD_ACCESS_DESC" default="1"/>
 		<field name="language" type="hidden" label="JFIELD_LANGUAGE_LABEL" description="JFIELD_LANGUAGE_DESC" default="*"/>

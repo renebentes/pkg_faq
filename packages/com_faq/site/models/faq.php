@@ -281,25 +281,4 @@ class FaqModelFaq extends JModelItem
 
 		return $this->_item[$pk];
 	}
-
-	/**
-	 * Method to increment the hit counter for the faq
-	 *
-	 * @param   int  $id  Optional ID of the faq.
-	 *
-	 * @return  boolean  True on success
-	 *
-	 * @since   2.5
-	 */
-	public function hit($id = 0)
-	{
-		if (empty($id))
-		{
-			$id = $this->getState('faq.id');
-		}
-
-		$faq = $this->getTable('Faq', 'FaqTable');
-
-		return $faq->hit($id);
-	}
 }

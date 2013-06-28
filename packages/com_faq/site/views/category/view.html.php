@@ -23,6 +23,8 @@ class FaqViewCategory extends JViewLegacy
 	protected $category;
 	protected $children;
 	protected $pagination;
+	protected $form;
+	protected $return_page;
 
 	/**
 	 * Execute and display a template script.
@@ -46,6 +48,10 @@ class FaqViewCategory extends JViewLegacy
 		$children   = $this->get('Children');
 		$parent     = $this->get('Parent');
 		$pagination = $this->get('Pagination');
+
+		$model       = JModelLegacy::getInstance('Form', 'FaqModel', array('ignore_request' => true));
+		$form        = $model->getForm();
+		$return_page = $model->getReturnPage();
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
@@ -116,7 +122,8 @@ class FaqViewCategory extends JViewLegacy
 		//Escape strings for HTML output
 		$this->pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 
-		$this->assignRef('maxLevel', $params->get('maxLevel', -1));
+		$maxLevel = $params->get('maxLevel', -1);
+		$this->assignRef('maxLevel', $maxLevel);
 		$this->assignRef('state', $state);
 		$this->assignRef('items', $items);
 		$this->assignRef('category', $category);
@@ -125,6 +132,8 @@ class FaqViewCategory extends JViewLegacy
 		$this->assignRef('parent', $parent);
 		$this->assignRef('pagination', $pagination);
 		$this->assignRef('user', $user);
+		$this->assignRef('form', $form);
+		$this->assignRef('return_page', $return_page);
 
 		$this->_prepareDocument();
 

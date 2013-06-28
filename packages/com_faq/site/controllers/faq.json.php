@@ -49,7 +49,7 @@ class FaqControllerFaq extends JControllerLegacy
 		$pk = JRequest::getInt('Itemid');
 
 		// Get the model.
-		$model = $this->getModel('Faq');
+		$model = $this->getModel('Form', 'FaqModel');
 
 		// Save the hit.
 		$return = $model->hit($pk);

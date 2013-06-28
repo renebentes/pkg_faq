@@ -62,6 +62,13 @@ class FaqTableFaq extends JTable
 			$array['metadata'] = (string) $registry;
 		}
 
+		if (isset($array['writer']) && is_array($array['writer']))
+		{
+			$registry = new JRegistry;
+			$registry->loadArray($array['writer']);
+			$array['writer'] = (string) $registry;
+		}
+
 		return parent::bind($array, $ignore);
 	}
 
@@ -80,7 +87,7 @@ class FaqTableFaq extends JTable
 		// Check for valid title.
 		if (trim($this->title) == '')
 		{
-			$this->setError(JText::_('COM_FAQ_WARNING_PROVIDE_VALID_NAME'));
+			$this->setError(JText::_('COM_FAQ_WARNING_PROVIDE_VALID_TITLE'));
 
 			return false;
 		}
@@ -164,7 +171,7 @@ class FaqTableFaq extends JTable
 		$table = JTable::getInstance('Faq', 'FaqTable');
 		if ($table->load(array('alias' => $this->alias)) && ($table->id != $this->id || $this->id == 0))
 		{
-			$this->setError(JText::_('COM_Faq_DATABASE_ERROR_UNIQUE_ALIAS'));
+			$this->setError(JText::_('COM_FAQ_DATABASE_ERROR_UNIQUE_ALIAS'));
 
 			return false;
 		}

@@ -10,19 +10,14 @@
 defined('_JEXEC') or die;
 
 JHtml::_('behavior.keepalive');
-JHtml::_('behavior.formvalidation');
 JHtml::_('behavior.tooltip');
-
-//$form = JForm::getInstance('com_faq.category', JPATH_ROOT . '/components/com_faq/models/forms/category.xml', array('control' => 'jform'));
-$model = JModelLegacy::getInstance('Form', 'FaqModel', array('ignore_request' => true));
-$form = $model->getForm();
+JHtml::_('behavior.formvalidation');
 
 ?>
 <script type="text/javascript">
 	Joomla.submitbutton = function(task) {
-		if (task == 'faq.submit' || document.formvalidator.isValid(document.id('faq-form'))) {
-			alert(document.id('faq-form'));
-			//Joomla.submitform(task);
+		if (document.formvalidator.isValid(document.getElementById('faqForm'))) {
+			Joomla.submitform(task, document.getElementById('faqForm'));
 		}
 		else {
 			alert('<?php echo $this->escape(JText::_('JGLOBAL_VALIDATION_FORM_FAILED'));?>');
@@ -30,20 +25,20 @@ $form = $model->getForm();
 	}
 </script>
 
-<div class="accordion faq-form" id="accordion1">
+<div class="accordion" id="accordionForm">
 	<div class="accordion-group">
 		<div class="accordion-heading">
-			<a href="#collapseask" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1">
+			<a href="#collapseask" class="accordion-toggle" data-toggle="collapse" data-parent="#accordionForm">
 				<i class="icon-plus"></i>
 				<?php echo JText::_('COM_FAQ_FORM_DEFAULT_LEGEND'); ?>
 			</a>
 		</div>
-		<div id="collapseask" class="accordion-body collapse fade">
+		<div id="collapseask" class="accordion-body collapse">
 			<div class="accordion-inner">
-				<form name="faq-form" id="faq-form" action="<?php echo JRoute::_('index.php?option=com_faq'); ?>" method="post" class="form-validate">
+				<form name="faqForm" id="faqForm" action="<?php echo JRoute::_('index.php?option=com_faq'); ?>" method="post" class="form-validate">
 					<div class="row-fluid">
-						<?php foreach ($form->getFieldsets('writer') as $fieldsets => $fieldset) :
-							$element = $form->getFieldset($fieldset->name);
+						<?php foreach ($this->form->getFieldsets('writer') as $fieldsets => $fieldset) :
+							$element = $this->form->getFieldset($fieldset->name);
 							if ($fieldset->name == 'jwriter' && !empty($element)) : ?>
 								<?php foreach ($element as $field): ?>
 									<div class="span6">
@@ -54,18 +49,21 @@ $form = $model->getForm();
 							<?php endif;
 						endforeach;?>
 					</div>
-					<?php echo $form->getLabel('title'); ?>
-					<?php echo $form->getInput('title'); ?>
+					<?php echo $this->form->getLabel('title'); ?>
+					<?php echo $this->form->getInput('title'); ?>
 					<div class="row-fluid">
 						<div class="span6">
-							<button type="submit" class="validate button btn btn-info"><i class="icon-chevron-right"></i><?php echo JText::_('JSUBMIT'); ?></button>
-							<?php $form->setValue('catid', null, $this->state->get('category.id')); ?>
-							<?php echo $form->getInput('catid'); ?>
-							<?php echo $form->getInput('published'); ?>
-							<?php echo $form->getInput('access'); ?>
-							<?php echo $form->getInput('language'); ?>
-							<input type="hidden" name="task" value="faq.submit" />
-							<?php echo JHtml::_( 'form.token' ); ?>
+							<button type="button" class="validate button btn btn-info" onclick="Joomla.submitbutton('faq.submit')"><i class="icon-chevron-right"></i><?php echo JText::_('JSUBMIT'); ?></button>
+							<?php $this->form->setValue('catid', null, $this->state->get('category.id')); ?>
+							<?php $this->form->setValue('created_by', null, $this->params->get('created_by')); ?>
+							<?php echo $this->form->getInput('catid'); ?>
+							<?php echo $this->form->getInput('published'); ?>
+							<?php echo $this->form->getInput('access'); ?>
+							<?php echo $this->form->getInput('language'); ?>
+							<?php echo $this->form->getInput('created_by'); ?>
+							<input type="hidden" name="task" value="" />
+							<input type="hidden" name="return" value="<?php echo $this->return_page;?>" />
+							<?php echo JHtml::_('form.token'); ?>
 						</div>
 					</div>
 				</form>
