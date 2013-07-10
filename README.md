@@ -39,7 +39,7 @@ Release Notes
 	! Relevant Message
 
 ######1.4
-	+ Função para ativação automática dos módulos
+	+ Função para ativação automática de subextensões durante a instalação/atualização
 	+ Módulo para exibição de FAQs mais populares no backend
 	+ Módulo para exibição de FAQs mais recentes no backend
 	+ Visualização de uma única FAQ

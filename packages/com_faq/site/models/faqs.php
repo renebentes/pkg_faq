@@ -329,15 +329,6 @@ class FaqModelFaqs extends JModelList
 		// Add the list ordering clause.
 		$query->order($db->escape($this->getState('list.ordering', 'a.ordering')) . ' ' . $db->escape($this->getState('list.direction', 'ASC')));
 
-		/*$query->group(
-			'a.id, a.title, a.alias, a.description, a.checked_out, a.checked_out_time, a.catid, ' .
-			'a.created_by, a.created_by_alias, a.created, a.modified, a.modified_by, uam.name, ' .
-			'a.publish_up, a.params, a.images, a.metakey, a.metadesc, a.metadata, a.access, a.hits, ' .
-			'a.published, a.publish_down, badcats.id, c.title, c.path, c.access, c.alias, uam.id, '.
-			'ua.name, ua.email, contact.id, parent.title, parent.id, parent.path, parent.alias, ' .
-			'c.published, c.lft, a.ordering, parent.lft, c.id'
-		);*/
-
 		return $query;
 	}
 

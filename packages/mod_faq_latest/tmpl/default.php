@@ -46,7 +46,7 @@ defined('_JEXEC') or die;
 				<?php echo JHtml::_('jgrid.published', $item->published, $i, '', false); ?>
 			</td>
 			<td class="center">
-				<?php echo JHtml::_('date', $item->created, 'Y-m-d H:i:s'); ?>
+				<?php echo JHtml::_('date', $item->created, JText::_('DATE_FORMAT_LC5')); ?>
 			</td>
 			<td class="center">
 				<?php echo $item->author_name;?>

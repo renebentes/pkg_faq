@@ -128,7 +128,7 @@ $listDirn	= $this->escape($this->state->get('list.direction'));
 					<?php endif;?>
 				</td>
 				<td class="center nowrap">
-					<?php echo JHtml::_('date', $item->created, JText::_('DATE_FORMAT_MK')); ?>
+					<?php echo JHtml::_('date', $item->created, JText::_('DATE_FORMAT_LC5')); ?>
 				</td>
 				<td class="center">
 					<?php echo (int) $item->id; ?>

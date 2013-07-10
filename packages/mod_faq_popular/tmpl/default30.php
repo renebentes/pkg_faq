@@ -35,14 +35,14 @@ JHtml::_('bootstrap.tooltip');
 					</strong>
 				</div>
 				<div class="span3">
-					<span class="small"><i class="icon-calendar"></i> <?php echo JHtml::_('date', $item->created, 'Y-m-d'); ?></span>
+					<span class="small"><i class="icon-calendar"></i> <?php echo JHtml::_('date', $item->created, JText::_('DATE_FORMAT_LC5')); ?></span>
 				</div>
 			</div>
 		<?php endforeach; ?>
 	<?php else : ?>
 		<div class="row-fluid">
 			<div class="span12">
-				<div class="alert"><?php echo JText::_('MOD_POPULAR_NO_MATCHING_RESULTS');?></div>
+				<div class="alert"><?php echo JText::_('MOD_FAQ_POPULAR_NO_MATCHING_RESULTS');?></div>
 			</div>
 		</div>
 	<?php endif; ?>
