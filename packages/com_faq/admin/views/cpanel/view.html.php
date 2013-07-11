@@ -9,8 +9,6 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.view');
-
 /**
  * View class for Cpanel.
  *
@@ -18,9 +16,13 @@ jimport('joomla.application.component.view');
  * @subpackage  com_faq
  * @since       2.5
  */
-class FaqViewCpanel extends JView
+class FaqViewCpanel extends JViewLegacy
 {
 	protected $items;
+
+	protected $modules = null;
+
+	protected $iconmodules = null;
 
 	/**
 	 * Method to display the view.
@@ -33,8 +35,7 @@ class FaqViewCpanel extends JView
 	 */
 	public function display($tpl = null)
 	{
-		// Initialise variables.
-		$model = JModel::getInstance('Faqs', 'FaqModel', array('ignore_request' => true));
+		$model = JModelLegacy::getInstance('Faqs', 'FaqModel', array('ignore_request' => true));
 		$model->setState('list.select', 'a.id, a.title, a.created, a.hits');
 		$model->setState('list.limit', 5);
 		$model->setState('list.ordering', 'a.hits');
@@ -48,6 +49,19 @@ class FaqViewCpanel extends JView
 			JError::raiseError(500, implode("\n", $errors));
 			return false;
 		}
+
+		$layout = $this->getLayout();
+		$version = new JVersion();
+		if ($version->isCompatible(3.0))
+		{
+			$this->setLayout($layout . '30');
+
+			// Display the submenu position modules.
+			$this->iconmodules = JModuleHelper::getModules('faq-icon');
+		}
+
+		// Display the cpanel modules.
+		$this->modules = JModuleHelper::getModules('faq-cpanel');
 
 		$this->addToolbar();
 

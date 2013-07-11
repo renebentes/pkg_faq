@@ -1,10 +1,11 @@
 pkg_faq
 =============
 
-Pacote de Extensão para gerenciamento de FAQs com suporte para Joomla! 2.5 e template com [Twitter Bootstrap](www.getbootstrap.com).
+Pacote de Extensão para gerenciamento de FAQs com suporte para [Joomla!](www.joomla.org) 2.5 e template com [Twitter Bootstrap](www.getbootstrap.com).
 
 * Componente: com_faq
 * Plugin: plg_search_faq
+* Módulos: mod_faq_latest, mod_faq_popular
 
 Author
 ------
@@ -24,6 +25,7 @@ You can [report a bug or request a feature here](http://github.com/renebentes/pk
 TODO
 ----
 * Visualizações no frontend
+* Tornar a extensão compatível com versões Joomla! 3.x
 
 Release Notes
 -------------
@@ -37,8 +39,10 @@ Release Notes
 	! Relevant Message
 
 ######1.4
+	+ Função para ativação automática de subextensões durante a instalação/atualização
+	+ Módulo para exibição de FAQs mais populares no backend
+	+ Módulo para exibição de FAQs mais recentes no backend
 	+ Visualização de uma única FAQ
-	* Correção na geração de links para plugin de pesquisa
 	+ Plugin para pesquisa de FAQs
 	+ Formulário para envio de perguntas na visualização de lista por categoria
 	+ Campos no banco de dados

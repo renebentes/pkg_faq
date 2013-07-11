@@ -29,23 +29,45 @@ class FaqHelper
      *
 	 * @since   2.5
 	 */
-	public static function addSubmenu($vName)
+	public static function addSubmenu($vName = 'cpanel')
 	{
-		JSubMenuHelper::addEntry(
-			JText::_('COM_FAQ_SUBMENU_CPANEL'),
-			'index.php?option=com_faq&view=cpanel',
-			$vName == 'cpanel'
-		);
-		JSubMenuHelper::addEntry(
-			JText::_('COM_FAQ_SUBMENU_FAQS'),
-			'index.php?option=com_faq&view=faqs',
-			$vName == 'faqs'
-		);
-		JSubMenuHelper::addEntry(
-			JText::_('COM_FAQ_SUBMENU_CATEGORIES'),
-			'index.php?option=com_categories&extension=com_faq',
-			$vName == 'categories'
-		);
+		$version = new JVersion();
+		if ($version->isCompatible(3.0))
+		{
+			JHtmlSidebar::addEntry(
+				JText::_('COM_FAQ_SUBMENU_CPANEL'),
+				'index.php?option=com_faq&view=cpanel',
+				$vName == 'cpanel'
+			);
+			JHtmlSidebar::addEntry(
+				JText::_('COM_FAQ_SUBMENU_FAQS'),
+				'index.php?option=com_faq&view=faqs',
+				$vName == 'faqs'
+			);
+			JHtmlSidebar::addEntry(
+				JText::_('COM_FAQ_SUBMENU_CATEGORIES'),
+				'index.php?option=com_categories&extension=com_faq',
+				$vName == 'categories'
+			);
+		}
+		else
+		{
+			JSubMenuHelper::addEntry(
+				JText::_('COM_FAQ_SUBMENU_CPANEL'),
+				'index.php?option=com_faq&view=cpanel',
+				$vName == 'cpanel'
+			);
+			JSubMenuHelper::addEntry(
+				JText::_('COM_FAQ_SUBMENU_FAQS'),
+				'index.php?option=com_faq&view=faqs',
+				$vName == 'faqs'
+			);
+			JSubMenuHelper::addEntry(
+				JText::_('COM_FAQ_SUBMENU_CATEGORIES'),
+				'index.php?option=com_categories&extension=com_faq',
+				$vName == 'categories'
+			);
+		}
 	}
 
 	/**

@@ -19,7 +19,6 @@ jimport('joomla.installer.installer');
  */
 class Com_FaqInstallerScript
 {
-
     /**
      * Extension name
      *
@@ -28,13 +27,44 @@ class Com_FaqInstallerScript
     private $_extension = 'com_faq';
 
     /**
-     * Array of obsoletes files
+     * Array of sub extensions package
+     *
+     * @var array
+     */
+    private $_subextensions = array(
+        'modules' => array(
+            'mod_faq_latest' => array(
+                'faq-cpanel',
+                1,
+                3,
+                '{"count":"5","ordering":"c_dsc","catid":"","user_id":"0","layout":"_:default","moduleclass_sfx":"","cache":"1","cache_time":"900","cachemode":"static"}',
+                1
+                ),
+            'mod_faq_popular' => array(
+                'faq-cpanel',
+                1,
+                3,
+                '{"count":"5","ordering":"c_dsc","catid":"","user_id":"0","layout":"_:default","moduleclass_sfx":"","cache":"1","cache_time":"900","cachemode":"static"}',
+                2
+                )
+            ),
+        'plugins' => array(
+            'plg_search_faq' => array(
+                'search',
+                1
+                )
+            )
+        );
+
+    /**
+     * Array of obsoletes files and folders
      *
      * @var array
      */
     private $_obsoletes = array(
         'files' => array(
             'administrator/components/com_faq/models/fields/faq.php',
+            'administrator/components/com_faq/views/cpanel/tmpl/default_stats.php',
             'components/com_faq/models/forms/faq.xml'
             ),
         'folders' => array(
@@ -102,6 +132,7 @@ class Com_FaqInstallerScript
      */
     function postflight($type, $parent)
     {
+        $this->_activeSubextensions($this->_subextensions);
         $this->_removeObsoletes($this->_obsoletes);
     }
 
@@ -151,6 +182,107 @@ class Com_FaqInstallerScript
     }
 
     /**
+     * Method to activate subextensions in the administrative area
+     */
+
+    private function _activeSubextensions($subextensions = array())
+    {
+        // Initialize variables
+        $db = JFactory::getDbo();
+
+        // Checking for modules
+        if (count($subextensions['modules']))
+        {
+            foreach ($subextensions['modules'] as $module => $preferences)
+            {
+                if (count($module))
+                {
+                    $query = $db->getQuery(true);
+                    $query->select('COUNT(*)');
+                    $query->from($db->quoteName('#__modules'));
+                    $query->where($db->quoteName('module') . ' = ' . $db->quote($module));
+                    $db->setQuery($query);
+                    $count = $db->loadResult();
+
+                    if($count > 0)
+                    {
+                        list($position, $published, $access, $params, $ordering) = $preferences;
+
+                        // Activate modules
+
+                        $query = $db->getQuery(true);
+                        $query->update($db->quoteName('#__modules'));
+                        $query->set(
+                            array(
+                                $db->quoteName('position') . ' = ' . $db->quote($position),
+                                $db->quoteName('published') . ' = ' . $published,
+                                $db->quoteName('access') . ' = ' . $access,
+                                $db->quoteName('params') . ' = \'' . $params . '\'',
+                                $db->quoteName('ordering') . ' = ' . $ordering
+                                )
+                            );
+                        $query->where($db->quoteName('module') . ' = ' . $db->quote($module));
+                        $db->setQuery($query);
+                        $db->execute();
+
+                        // Link to all pages
+                        $query = $db->getQuery(true);
+                        $query->select('id');
+                        $query->from($db->quoteName('#__modules'));
+                        $query->where($db->quoteName('module') . ' = ' . $db->quote($module));
+                        $db->setQuery($query);
+                        $moduleId = $db->loadResult();
+
+                        $query = $db->getQuery(true);
+                        $query->select('*');
+                        $query->from($db->quoteName('#__modules_menu'));
+                        $query->where($db->quoteName('moduleid') . ' = ' . $moduleId);
+                        $db->setQuery($query);
+                        $result = $db->loadColumn();
+                        if(empty($result))
+                        {
+                            $query = $db->getQuery(true);
+                            $query->insert($db->quoteName('#__modules_menu'));
+                            $query->columns($db->quoteName(array('moduleid', 'menuid')));
+                            $query->values(implode(',', array($moduleId, 0)));
+
+                            $db->setQuery($query);
+                            $db->execute();
+                        }
+                    }
+                }
+            }
+        }
+
+        // Checking for plugins
+        if (count($subextensions['plugins']))
+        {
+            foreach ($subextensions['plugins'] as $plugin => $preferences)
+            {
+                list($group, $published) = $preferences;
+                $query = $db->getQuery(true);
+                $query->select('COUNT(*)');
+                $query->from($db->quoteName('#__extensions'));
+                $query->where($db->quoteName('element') . ' = ' . $db->quote($plugin));
+                $query->where($db->quoteName('folder') . ' = ' . $db->quote($group));
+                $db->setQuery($query);
+                $count = $db->loadResult();
+
+                if ($count > 0)
+                {
+                    $query = $db->getQuery(true);
+                    $query->update($db->quoteName('#__extensions'));
+                    $query->set($db->quoteName('enabled') . ' = ' . $db->quote($published));
+                    $query->where($db->quoteName('element') . ' = ' . $db->quote($plugin));
+                    $query->where($db->quoteName('folder') . ' = ' . $db->quote($group));
+                    $db->setQuery($query);
+                    $db->execute();
+                }
+            }
+        }
+    }
+
+    /**
      * Method for bugfix for "DB function returned no error"
      */
     private function _bugfixDBFunctionReturnedNoError()
@@ -163,14 +295,7 @@ class Com_FaqInstallerScript
             ->from('#__assets')
             ->where($db->qn('name') . ' = ' . $db->q($this->_extension));
         $db->setQuery($query);
-        if(version_compare(JVERSION, '3.0', 'ge'))
-        {
-            $ids = $db->loadColumn();
-        }
-        else
-        {
-            $ids = $db->loadResultArray();
-        }
+        $ids = $db->loadColumn();
 
         if(!empty($ids))
         {
@@ -190,14 +315,7 @@ class Com_FaqInstallerScript
             ->from('#__extensions')
             ->where($db->qn('element') . ' = ' . $db->q($this->_extension));
         $db->setQuery($query);
-        if(version_compare(JVERSION, '3.0', 'ge'))
-        {
-            $ids = $db->loadColumn();
-        }
-        else
-        {
-            $ids = $db->loadResultArray();
-        }
+        $ids = $db->loadColumn();
 
         if(!empty($ids))
         {
@@ -217,16 +335,9 @@ class Com_FaqInstallerScript
             ->from('#__menu')
             ->where($db->qn('type') . ' = ' . $db->q('component'))
             ->where($db->qn('menutype') . ' = ' . $db->q('main'))
-            ->where($db->qn('link'). ' LIKE ' . $db->q('index.php?option='.$this->_extension));
+            ->where($db->qn('link') . ' LIKE ' . $db->q('index.php?option=' . $this->_extension));
         $db->setQuery($query);
-        if(version_compare(JVERSION, '3.0', 'ge'))
-        {
-            $ids = $db->loadColumn();
-        }
-        else
-        {
-            $ids = $db->loadResultArray();
-        }
+        $ids = $db->loadColumn();
 
         if(!empty($ids))
         {
@@ -254,15 +365,7 @@ class Com_FaqInstallerScript
             ->from('#__extensions')
             ->where($db->qn('element') . ' = ' . $db->q($this->_extension));
         $db->setQuery($query);
-
-        if(version_compare(JVERSION, '3.0', 'ge'))
-        {
-            $ids = $db->loadColumn();
-        }
-        else
-        {
-            $ids = $db->loadResultArray();
-        }
+        $ids = $db->loadColumn();
 
         if(count($ids) > 1)
         {
@@ -309,15 +412,7 @@ class Com_FaqInstallerScript
             ->where($db->qn('menutype') . ' = ' . $db->q('main'))
             ->where($db->qn('link') . ' LIKE ' . $db->q('index.php?option='.$this->_extension));
         $db->setQuery($query);
-
-        if(version_compare(JVERSION, '3.0', 'ge'))
-        {
-            $ids1 = $db->loadColumn();
-        }
-        else
-        {
-            $ids1 = $db->loadResultArray();
-        }
+        $ids1 = $db->loadColumn();
 
         if(empty($ids1))
         {
@@ -328,18 +423,10 @@ class Com_FaqInstallerScript
         $query->select('id')
             ->from('#__menu')
             ->where($db->qn('type') . ' = ' . $db->q('component'))
-            ->where($db->qn('menutype'). ' = ' . $db->q('main'))
+            ->where($db->qn('menutype') . ' = ' . $db->q('main'))
             ->where($db->qn('link') . ' LIKE ' . $db->q('index.php?option='.$this->_extension . '&%'));
         $db->setQuery($query);
-
-        if(version_compare(JVERSION, '3.0', 'ge'))
-        {
-            $ids2 = $db->loadColumn();
-        }
-        else
-        {
-            $ids2 = $db->loadResultArray();
-        }
+        $ids2 = $db->loadColumn();
 
         if(empty($ids2))
         {

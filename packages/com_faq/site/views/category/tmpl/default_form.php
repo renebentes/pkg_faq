@@ -25,15 +25,15 @@ JHtml::_('behavior.formvalidation');
 	}
 </script>
 
-<div class="accordion faq-form" id="accordion1">
+<div class="accordion" id="accordionForm">
 	<div class="accordion-group">
 		<div class="accordion-heading">
-			<a href="#collapseask" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1">
+			<a href="#collapseask" class="accordion-toggle" data-toggle="collapse" data-parent="#accordionForm">
 				<i class="icon-plus"></i>
 				<?php echo JText::_('COM_FAQ_FORM_DEFAULT_LEGEND'); ?>
 			</a>
 		</div>
-		<div id="collapseask" class="accordion-body collapse fade">
+		<div id="collapseask" class="accordion-body collapse">
 			<div class="accordion-inner">
 				<form name="faqForm" id="faqForm" action="<?php echo JRoute::_('index.php?option=com_faq'); ?>" method="post" class="form-validate">
 					<div class="row-fluid">

@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 2 or later; see http://www.gnu.org/licenses/gpl-2.0.html</license>
 	<authorEmail>renebentes@yahoo.com.br</authorEmail>
 	<authorUrl></authorUrl>
-	<version>1.4</version>
+	<version>1.5</version>
 	<description>Faq package to combine multiple extensions</description>
 	<packagename>faq</packagename>
 	<url></url>
@@ -17,5 +17,7 @@
 	<files folder="packages">
 		<file type="component" id="faq">com_faq</file>
 		<file type="plugin" id="faq" group="search" client="site">plg_search_faq</file>
+		<file type="module" id="faq" client="administrator">mod_faq_latest</file>
+		<file type="module" id="faq" client="administrator">mod_faq_popular</file>
 	</files>
 </extension>
