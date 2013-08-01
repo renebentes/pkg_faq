@@ -10,8 +10,8 @@ Pacote de Extensão para gerenciamento de FAQs.
 Requirements
 ------------
 
-* [Joomla! 2.5+](www.joomla.org);
-* Template com [Twitter Bootstrap 2.1.0+](www.getbootstrap.com).
+* [Joomla! 2.5+](http://www.joomla.org);
+* Template com [Twitter Bootstrap 2.1.0+](http://www.getbootstrap.com).
 
 Author
 ------
