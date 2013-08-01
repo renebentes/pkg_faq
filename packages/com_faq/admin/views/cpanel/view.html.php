@@ -35,13 +35,8 @@ class FaqViewCpanel extends JViewLegacy
 	 */
 	public function display($tpl = null)
 	{
-		$model = JModelLegacy::getInstance('Faqs', 'FaqModel', array('ignore_request' => true));
-		$model->setState('list.select', 'a.id, a.title, a.created, a.hits');
-		$model->setState('list.limit', 5);
-		$model->setState('list.ordering', 'a.hits');
-		$model->setState('list.direction', 'desc');
-
-		$this->items = $model->getItems();
+		// Initialize variables
+		$layout = $this->getLayout();
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
@@ -50,9 +45,7 @@ class FaqViewCpanel extends JViewLegacy
 			return false;
 		}
 
-		$layout = $this->getLayout();
-		$version = new JVersion();
-		if ($version->isCompatible(3.0))
+		if (FaqHelper::checkJoomla())
 		{
 			$this->setLayout($layout . '30');
 
@@ -77,8 +70,7 @@ class FaqViewCpanel extends JViewLegacy
 	 */
 	protected function addToolbar()
 	{
-		require_once JPATH_COMPONENT . '/helpers/faq.php';
-
+		// Initialize variables
 		$canDo = FaqHelper::getActions();
 		$user = JFactory::getUser();
 

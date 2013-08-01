@@ -51,14 +51,13 @@ JHtml::_('behavior.caption');
 						<?php $author =  $this->item->author; ?>
 						<?php $author = ($this->item->created_by_alias ? $this->item->created_by_alias : $author);?>
 
-						<?php if (!empty($this->item->contactid ) &&  $params->get('link_author') == true):?>
-							<?php echo JText::sprintf('COM_FAQ_WRITTEN_BY' ,
-						 	'<span>' . JHtml::_('link', JRoute::_('index.php?option=com_contact&view=contact&id='.$this->item->contactid), $author) . '</span>'); ?>
+						<?php if (!empty($this->item->contactid ) &&  $params->get('link_author') == true) : ?>
+							<?php echo JText::sprintf('COM_FAQ_WRITTEN_BY' , JHtml::_('link', JRoute::_('index.php?option=com_contact&view=contact&id='. $this->item->contactid), $author)); ?>
 						<?php else :?>
-							<?php echo JText::sprintf('COM_FAQ_WRITTEN_BY', '<span>' . $author . '</span>'); ?>
+							<?php echo JText::sprintf('COM_FAQ_WRITTEN_BY', $author); ?>
 						<?php endif; ?>
 
-						<?php if ($params->get('show_parent_category') && $this->item->parent_slug != '1:root') : ?>
+						<?php if ($params->get('show_parent_category') && ($this->item->parent_slug != '1:root' || $this->item->parent_slug != 'ROOT')) : ?>
 							<i class="icon-tags"></i>
 							<?php $title = $this->escape($this->item->parent_title);
 							$url = '<a href="' . JRoute::_(FaqHelperRoute::getCategoryRoute($this->item->parent_slug)) . '">' . $title . '</a>'; ?>
@@ -85,17 +84,17 @@ JHtml::_('behavior.caption');
 			<?php if ($params->get('show_publish_date') || $params->get('show_created_date') || $params->get('show_modified_date')) : ?>
 				<dd>
 					<?php if ($params->get('show_create_date')) : ?>
-						<i class="icon-time"></i>
+						<i class="icon-calendar"></i>
 						<?php echo JText::sprintf('COM_FAQ_CREATED_DATE_ON', JHtml::_('date', $this->item->created, JText::_('DATE_FORMAT_LC3'))); ?>
 					<?php endif; ?>
 
 					<?php if ($params->get('show_modify_date')) : ?>
-						<i class="icon-time"></i>
+						<i class="icon-calendar"></i>
 						<?php echo JText::sprintf('COM_FAQ_LAST_UPDATED', JHtml::_('date', $this->item->modified, JText::_('DATE_FORMAT_LC3'))); ?>
 					<?php endif; ?>
 
 					<?php if ($params->get('show_publish_date')) : ?>
-						<i class="icon-time"></i>
+						<i class="icon-calendar"></i>
 						<?php echo JText::sprintf('COM_FAQ_PUBLISHED_DATE_ON', JHtml::_('date', $this->item->publish_up, JText::_('DATE_FORMAT_LC3'))); ?>
 					<?php endif; ?>
 				</dd>
@@ -103,8 +102,8 @@ JHtml::_('behavior.caption');
 
 			<?php if ($params->get('show_hits')) : ?>
       			<dd>
-      				<i class="icon-signal"></i>
-      				<?php echo JText::sprintf('COM_FAQ_HITS', '<span>'.$this->item->hits.'</span>'); ?>
+      				<i class="icon-eye-open"></i>
+      				<?php echo JText::sprintf('COM_FAQ_HITS', $this->item->hits); ?>
       			</dd>
       		<?php endif; ?>
 

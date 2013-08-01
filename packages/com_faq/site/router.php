@@ -1,4 +1,4 @@
-<?php
+	<?php
 /**
  * @package     Faq
  * @subpackage  com_faq
@@ -24,12 +24,13 @@ function FaqBuildRoute(&$query)
 {
 	$segments = array();
 
-	// get a menu item based on Itemid or currently active
-	$app	= JFactory::getApplication();
-	$menu	= $app->getMenu();
-	$params	= JComponentHelper::getParams('com_faq');
+	// Get a menu item based on Itemid or currently active
+	$app    = JFactory::getApplication();
+	$menu   = $app->getMenu();
+	$params = JComponentHelper::getParams('com_faq');
 	$advanced = $params->get('sef_advanced_link', 0);
 
+	// We need a menu item. Either the one specified in the query, or the current active one if none specified
 	if (empty($query['Itemid']))
 	{
 		$menuItem = $menu->getActive();
@@ -39,13 +40,14 @@ function FaqBuildRoute(&$query)
 		$menuItem = $menu->getItem($query['Itemid']);
 	}
 
-	$mView	= (empty($menuItem->query['view'])) ? null : $menuItem->query['view'];
-	$mId	= (empty($menuItem->query['id'])) ? null : $menuItem->query['id'];
+	$mView  = (empty($menuItem->query['view'])) ? null : $menuItem->query['view'];
+	$mId    = (empty($menuItem->query['id'])) ? null : $menuItem->query['id'];
 
 	if (isset($query['view']))
 	{
 		$view = $query['view'];
-		if (empty($query['Itemid']))
+
+		if (empty($query['Itemid']) || empty($menuItem) || $menuItem->component != 'com_faq')
 		{
 			$segments[] = $query['view'];
 		}
@@ -55,10 +57,10 @@ function FaqBuildRoute(&$query)
 		{
 			unset($query['view']);
 		}
-	};
+	}
 
 	// Are we dealing with an faq that is attached to a menu item?
-	if (isset($query['view']) && ($mView == $query['view']) and (isset($query['id'])) and ($mId == (int) $query['id']))
+	if (isset($view) && ($mView == $view) and (isset($query['id'])) and ($mId == (int) $query['id']))
 	{
 		unset($query['view']);
 		unset($query['catid']);
@@ -69,9 +71,9 @@ function FaqBuildRoute(&$query)
 
 	if (isset($view) and ($view == 'category' or $view == 'faq'))
 	{
-		if ($mId != intval($query['id']) || $mView != $view)
+		if ($mId != (int) $query['id'] || $mView != $view)
 		{
-			if($view == 'faq' && isset($query['catid']))
+			if ($view == 'faq' && isset($query['catid']))
 			{
 				$catid = $query['catid'];
 			}
@@ -79,32 +81,40 @@ function FaqBuildRoute(&$query)
 			{
 				$catid = $query['id'];
 			}
+
 			$menuCatid = $mId;
 			$categories = JCategories::getInstance('Faq');
 			$category = $categories->get($catid);
-			if($category)
+
+			if ($category)
 			{
-				//TODO Throw error that the category either not exists or is unpublished
-				$path = array_reverse($category->getPath());
+				// TODO Throw error that the category either not exists or is unpublished.
+				$path = $category->getPath();
+				$path = array_reverse($path);
 
 				$array = array();
-				foreach($path as $id)
+
+				foreach ($path as $id)
 				{
-					if((int) $id == (int)$menuCatid)
+					if ((int) $id == (int) $menuCatid)
 					{
 						break;
 					}
-					if($advanced)
+
+					if ($advanced)
 					{
 						list($tmp, $id) = explode(':', $id, 2);
 					}
+
 					$array[] = $id;
 				}
+
 				$segments = array_merge($segments, array_reverse($array));
 			}
-			if($view == 'faq')
+
+			if ($view == 'faq')
 			{
-				if($advanced)
+				if ($advanced)
 				{
 					list($tmp, $id) = explode(':', $query['id'], 2);
 				}
@@ -112,9 +122,11 @@ function FaqBuildRoute(&$query)
 				{
 					$id = $query['id'];
 				}
+
 				$segments[] = $id;
 			}
 		}
+
 		unset($query['id']);
 		unset($query['catid']);
 	}
@@ -125,7 +137,6 @@ function FaqBuildRoute(&$query)
 		{
 			if ($query['layout'] == $menuItem->query['layout'])
 			{
-
 				unset($query['layout']);
 			}
 		}
@@ -136,7 +147,7 @@ function FaqBuildRoute(&$query)
 				unset($query['layout']);
 			}
 		}
-	};
+	}
 
 	return $segments;
 }
@@ -152,10 +163,10 @@ function FaqParseRoute($segments)
 	$vars = array();
 
 	// Get the active menu item.
-	$app    = JFactory::getApplication();
-	$menu   = $app->getMenu();
-	$item   = $menu->getActive();
-	$params = JComponentHelper::getParams('com_faq');
+	$app      = JFactory::getApplication();
+	$menu     = $app->getMenu();
+	$item     = $menu->getActive();
+	$params   = JComponentHelper::getParams('com_faq');
 	$advanced = $params->get('sef_advanced_link', 0);
 
 	// Count route segments
@@ -171,26 +182,30 @@ function FaqParseRoute($segments)
 	}
 
 	// From the categories view, we can only jump to a category.
-	$id = (isset($item->query['id']) && $item->query['id'] > 1) ? $item->query['id'] : 'root';
-	$categories = JCategories::getInstance('Faq')->get($id)->getChildren();
+	$id       = (isset($item->query['id']) && $item->query['id'] > 1) ? $item->query['id'] : 'root';
+	$category = JCategories::getInstance('Faq')->get($id);
 
-	$vars['catid'] = $id;
-	$vars['id'] = $id;
+	if (!$category)
+	{
+		JError::raiseError(404, JText::_('COM_FAQ_ERROR_PARENT_CATEGORY_NOT_FOUND'));
+		return $vars;
+	}
+
+	$categories = $category->getChildren();
+
 	$found = 0;
 
 	foreach ($segments as $segment)
 	{
-		$segment = $advanced ? str_replace(':', '-', $segment) : $segment;
-
 		foreach ($categories as $category)
 		{
-			if ($category->slug == $segment || $category->alias == $segment)
+			if (($category->slug == $segment) || ($advanced && $category->alias == str_replace(':', '-', $segment)))
 			{
 				$vars['id'] = $category->id;
-				$vars['catid'] = $category->id;
 				$vars['view'] = 'category';
 				$categories = $category->getChildren();
 				$found = 1;
+
 				break;
 			}
 		}
@@ -200,17 +215,23 @@ function FaqParseRoute($segments)
 			if ($advanced)
 			{
 				$db = JFactory::getDBO();
-				$query = 'SELECT id FROM #__faq WHERE catid = ' . $vars['catid'] . ' AND alias = ' . $db->Quote($segment);
+				$query = $db->getQuery(true);
+				$query->select($db->quoteName('id'));
+				$query->from($db->quoteName('#__faq'));
+				$query->where($db->quoteName('catid') . ' = ' . (int) $vars['catid']);
+				$query->where($db->quoteName('alias') . ' = ' . $db->quote(str_replace(':', '-', $segment)));
 				$db->setQuery($query);
-				$nid = $db->loadResult();
+				$id = $db->loadResult();
 			}
 			else
 			{
-				$nid = $segment;
+				$id = $segment;
 			}
 
-			$vars['id'] = $nid;
+			$vars['id'] = $id;
 			$vars['view'] = 'faq';
+
+			break;
 		}
 
 		$found = 0;

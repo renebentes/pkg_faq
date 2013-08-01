@@ -11,9 +11,8 @@ defined('_JEXEC') or die;
 
 // Include dependancies
 require_once JPATH_COMPONENT . '/helpers/route.php';
-JTable::addIncludePath(JPATH_COMPONENT_ADMINISTRATOR . '/tables');
 
 // Execute the task.
 $controller = JControllerLegacy::getInstance('Faq');
-$controller->execute(JRequest::getCmd('task'));
+$controller->execute(JFactory::getApplication()->input->get('task'));
 $controller->redirect();

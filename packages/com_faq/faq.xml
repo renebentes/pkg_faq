@@ -71,4 +71,7 @@
 			<language tag="pt-BR">language/pt-BR/pt-BR.com_faq.sys.ini</language>
 		</languages>
 	</administration>
+	<tables>
+		<table>#__faq</table>
+	</tables>
 </extension>

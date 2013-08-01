@@ -18,13 +18,13 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 <?php if (empty($this->items) && $this->params->get('show_no_results', 1)) : ?>
 <p><?php echo JText::_('COM_FAQ_NO_RESULTS'); ?></p>
 <?php else : ?>
-<div class="accordion" id="accordionFaq">
+<div id="faq-items" class="accordion">
 	<?php
 	$x = 1;
 	foreach ($this->items as $item) : ?>
 	<div class="accordion-group">
 		<div class="accordion-heading">
-			<a href="#collapse<?php echo $item->id; ?>" class="accordion-toggle" data-toggle="collapse" data-parent="#accordionFaq" onclick="addHit(<?php echo $item->id; ?>);">
+			<a href="#collapse<?php echo $item->id; ?>" class="accordion-toggle" data-toggle="collapse" data-parent="#faq-items" onclick="hit(<?php echo $item->id; ?>);">
 				<i class="icon-question-sign"></i>
 				<?php echo $this->escape($item->title); ?>
 			</a>
@@ -32,6 +32,20 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 		<div id="collapse<?php echo $item->id; ?>" class="accordion-body collapse<?php echo $x == 1 ? ' in' : ''; ?>">
 			<div class="accordion-inner">
 				<?php echo JHtml::_('content.prepare', $item->description); ?>
+				<dl class="pull-right">
+					<dd>
+						<i class="icon-eye-open"></i>
+						<span id="hits<?php echo $item->id; ?>">
+							<?php echo JText::sprintf('COM_FAQ_HITS', $item->hits); ?>
+						</span>
+					</dd>
+					<dd>
+						<i class="icon-thumbs-up"></i>
+						<span id="up<?php echo $item->id; ?>"></span>
+						<i class="icon-thumbs-down"></i>
+						<span id="down<?php echo $item->id; ?>"></span>
+				</dl>
+				<div class="clearfix"></div>
 			</div>
 		</div>
 	</div>

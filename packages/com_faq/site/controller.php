@@ -19,6 +19,28 @@ defined('_JEXEC') or die;
 class FaqController extends JControllerLegacy
 {
 	/**
+	 * Variable declaration for compatibility with future versions
+	 *
+	 * @var JInput
+	 */
+	protected $input;
+
+	/**
+ 	 * Constructor
+ 	 *
+ 	 * @param   array  $config  An optional associative array of configuration settings.
+ 	 *
+ 	 * @see     JControllerLegacy
+ 	 * @since   2.5
+ 	*/
+	public function __construct($config = array())
+	{
+		$this->input = JFactory::getApplication()->input;
+
+		parent::__construct($config);
+	}
+
+	/**
 	 * Method to display a view.
 	 *
 	 * @param   boolean  $cachable   If true, the view output will be cached
@@ -32,15 +54,17 @@ class FaqController extends JControllerLegacy
 	{
 		// Initialise variables.
 		$cachable = true;
-		$user = JFactory::getUser();
 
 		// Set the default view name and format from the Request.
-		// Note we are using f_id to avoid collisions with the router and the return page.
-		$id    = JRequest::getInt('f_id');
-		$vName = JRequest::getCmd('view', 'categories');
-		JRequest::setVar('view', $vName);
+		// Note we are using a_id to avoid collisions with the router and the return page.
+		// Frontend is a bit messier than the backend.
+		$id    = $this->input->getInt('f_id');
+		$vName = $this->input->get('view', 'categories');
+		$this->input->set('view', $vName);
 
-		if ($user->get('id') || ($_SERVER['REQUEST_METHOD'] == 'POST' && $vName = 'categories'))
+		$user     = JFactory::getUser();
+
+		if ($user->get('id') || ($this->input->getMethod() == 'POST' && $vName = 'categories'))
 		{
 			$cachable = false;
 		}

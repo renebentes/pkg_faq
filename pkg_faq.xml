@@ -15,9 +15,9 @@
 	<packagerurl></packagerurl>
 	<update></update>
 	<files folder="packages">
-		<file type="component" id="faq">com_faq</file>
 		<file type="plugin" id="faq" group="search" client="site">plg_search_faq</file>
 		<file type="module" id="faq" client="administrator">mod_faq_latest</file>
 		<file type="module" id="faq" client="administrator">mod_faq_popular</file>
+		<file type="component" id="faq">com_faq</file>
 	</files>
 </extension>

@@ -31,8 +31,7 @@ class FaqHelper
 	 */
 	public static function addSubmenu($vName = 'cpanel')
 	{
-		$version = new JVersion();
-		if ($version->isCompatible(3.0))
+		if (self::checkJoomla())
 		{
 			JHtmlSidebar::addEntry(
 				JText::_('COM_FAQ_SUBMENU_CPANEL'),
@@ -67,6 +66,13 @@ class FaqHelper
 				'index.php?option=com_categories&extension=com_faq',
 				$vName == 'categories'
 			);
+		}
+
+		if ($vName == 'categories')
+		{
+			JToolbarHelper::title(
+				JText::sprintf('COM_CATEGORIES_CATEGORIES_TITLE', JText::_('com_faq')),
+				'faq-categories');
 		}
 	}
 
@@ -119,7 +125,7 @@ class FaqHelper
 	public static function button($controller, $image, $text)
 	{
 		// Define variables
-		$option = JRequest::getCmd('option');
+		$option = JFactory::getApplication()->input->get('option');
 		if ($controller == 'categories')
 		{
 			$link   = JRoute::_('index.php?option=com_categories&extension=' . $option, false);
@@ -139,5 +145,16 @@ class FaqHelper
 		$html[] = '</div>';
 
 		return implode($html);
+	}
+
+	/**
+	 * Checks whether the version of Joomla! is compatible with 3.0
+	 *
+	 * @return boolean True if compatible
+	 */
+	public static function checkJoomla()
+	{
+		$version = new JVersion;
+		return $version->isCompatible(3.0);
 	}
 }

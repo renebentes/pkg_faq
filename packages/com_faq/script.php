@@ -65,7 +65,8 @@ class Com_FaqInstallerScript
         'files' => array(
             'administrator/components/com_faq/models/fields/faq.php',
             'administrator/components/com_faq/views/cpanel/tmpl/default_stats.php',
-            'components/com_faq/models/forms/faq.xml'
+            'components/com_faq/models/forms/faq.xml',
+            'components/com_faq/controllers/faq.json.php'
             ),
         'folders' => array(
             )
@@ -132,7 +133,11 @@ class Com_FaqInstallerScript
      */
     function postflight($type, $parent)
     {
-        $this->_activeSubextensions($this->_subextensions);
+        if($type != 'uninstall')
+        {
+            $this->_activeSubextensions($this->_subextensions);
+        }
+
         $this->_removeObsoletes($this->_obsoletes);
     }
 
@@ -209,7 +214,6 @@ class Com_FaqInstallerScript
                         list($position, $published, $access, $params, $ordering) = $preferences;
 
                         // Activate modules
-
                         $query = $db->getQuery(true);
                         $query->update($db->quoteName('#__modules'));
                         $query->set(
@@ -223,7 +227,11 @@ class Com_FaqInstallerScript
                             );
                         $query->where($db->quoteName('module') . ' = ' . $db->quote($module));
                         $db->setQuery($query);
-                        $db->execute();
+                        if (!$db->execute())
+                        {
+                            JError::raiseWarning(1, JText::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)));
+                            return;
+                        }
 
                         // Link to all pages
                         $query = $db->getQuery(true);
@@ -247,7 +255,11 @@ class Com_FaqInstallerScript
                             $query->values(implode(',', array($moduleId, 0)));
 
                             $db->setQuery($query);
-                            $db->execute();
+                            if (!$db->execute())
+                            {
+                                JError::raiseWarning(1, JText::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)));
+                                return;
+                            }
                         }
                     }
                 }
@@ -263,7 +275,8 @@ class Com_FaqInstallerScript
                 $query = $db->getQuery(true);
                 $query->select('COUNT(*)');
                 $query->from($db->quoteName('#__extensions'));
-                $query->where($db->quoteName('element') . ' = ' . $db->quote($plugin));
+                $query->where($db->quoteName('name') . ' = ' . $db->quote($plugin));
+                $query->where($db->quoteName('type') . ' = ' . $db->quote('plugin'));
                 $query->where($db->quoteName('folder') . ' = ' . $db->quote($group));
                 $db->setQuery($query);
                 $count = $db->loadResult();
@@ -273,10 +286,15 @@ class Com_FaqInstallerScript
                     $query = $db->getQuery(true);
                     $query->update($db->quoteName('#__extensions'));
                     $query->set($db->quoteName('enabled') . ' = ' . $db->quote($published));
-                    $query->where($db->quoteName('element') . ' = ' . $db->quote($plugin));
+                    $query->where($db->quoteName('name') . ' = ' . $db->quote($plugin));
+                    $query->where($db->quoteName('type') . ' = ' . $db->quote('plugin'));
                     $query->where($db->quoteName('folder') . ' = ' . $db->quote($group));
                     $db->setQuery($query);
-                    $db->execute();
+                    if (!$db->execute())
+                    {
+                        JError::raiseWarning(1, JText::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)));
+                        return;
+                    }
                 }
             }
         }
@@ -305,7 +323,11 @@ class Com_FaqInstallerScript
                 $query->delete('#__assets')
                     ->where($db->qn('id') . ' = ' . $db->q($id));
                 $db->setQuery($query);
-                $db->execute();
+                if (!$db->execute())
+                {
+                    JError::raiseWarning(1, JText::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)));
+                    return;
+                }
             }
         }
 
@@ -325,7 +347,11 @@ class Com_FaqInstallerScript
                 $query->delete('#__extensions')
                     ->where($db->qn('extension_id') . ' = ' . $db->q($id));
                 $db->setQuery($query);
-                $db->execute();
+                if (!$db->execute())
+                {
+                    JError::raiseWarning(1, JText::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)));
+                    return;
+                }
             }
         }
 
@@ -347,7 +373,11 @@ class Com_FaqInstallerScript
                 $query->delete('#__menu')
                     ->where($db->qn('id') . ' = ' . $db->q($id));
                 $db->setQuery($query);
-                $db->execute();
+                if (!$db->execute())
+                {
+                    JError::raiseWarning(1, JText::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)));
+                    return;
+                }
             }
         }
     }
@@ -378,7 +408,11 @@ class Com_FaqInstallerScript
                 $query->delete('#__extensions')
                     ->where($db->qn('extension_id') . ' = ' . $db->q($id));
                 $db->setQuery($query);
-                $db->execute();
+                if (!$db->execute())
+                {
+                    JError::raiseWarning(1, JText::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)));
+                    return;
+                }
             }
         }
 
@@ -400,7 +434,11 @@ class Com_FaqInstallerScript
                 $query->delete('#__assets')
                     ->where($db->qn('id') . ' = ' . $db->q($id));
                 $db->setQuery($query);
-                $db->execute();
+                if (!$db->execute())
+                {
+                    JError::raiseWarning(1, JText::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)));
+                    return;
+                }
             }
         }
 
@@ -424,7 +462,7 @@ class Com_FaqInstallerScript
             ->from('#__menu')
             ->where($db->qn('type') . ' = ' . $db->q('component'))
             ->where($db->qn('menutype') . ' = ' . $db->q('main'))
-            ->where($db->qn('link') . ' LIKE ' . $db->q('index.php?option='.$this->_extension . '&%'));
+            ->where($db->qn('link') . ' LIKE ' . $db->q('index.php?option=' . $this->_extension . '&%'));
         $db->setQuery($query);
         $ids2 = $db->loadColumn();
 
@@ -442,7 +480,11 @@ class Com_FaqInstallerScript
                 $query->delete('#__menu')
                     ->where($db->qn('id') . ' = ' . $db->q($id));
                 $db->setQuery($query);
-                $db->execute();
+                if (!$db->execute())
+                {
+                    JError::raiseWarning(1, JText::sprintf('JLIB_INSTALLER_ERROR_SQL_ERROR', $db->stderr(true)));
+                    return;
+                }
             }
         }
     }

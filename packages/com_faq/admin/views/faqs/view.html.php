@@ -9,8 +9,6 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.view');
-
 /**
  * View class for a list of Faqs.
  *
@@ -18,7 +16,7 @@ jimport('joomla.application.component.view');
  * @subpackage  com_faq
  * @since       2.5
  */
-class FaqViewfaqs extends JView
+class FaqViewfaqs extends JViewLegacy
 {
 	protected $items;
 
@@ -42,6 +40,8 @@ class FaqViewfaqs extends JView
 		$this->pagination = $this->get('Pagination');
 		$this->state      = $this->get('State');
 
+		FaqHelper::addSubmenu('faqs');
+
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
@@ -50,8 +50,16 @@ class FaqViewfaqs extends JView
 		}
 
 		// We don't need toolbar in the modal window.
-		if ($this->getLayout() !== 'modal') {
+		$layout = $this->getLayout();
+		if ($layout !== 'modal')
+		{
 			$this->addToolbar();
+			// Set layout for Joomla! 3.x
+			if (FaqHelper::checkJoomla())
+			{
+				$this->setLayout($layout . '30');
+				$this->sidebar = JHtmlSidebar::render();
+			}
 		}
 
 		parent::display($tpl);
@@ -66,8 +74,6 @@ class FaqViewfaqs extends JView
 	 */
 	protected function addToolbar()
 	{
-		require_once JPATH_COMPONENT . '/helpers/faq.php';
-
 		$state = $this->get('State');
 		$canDo = FaqHelper::getActions($state->get('filter.category_id'));
 		$user  = JFactory::getUser();
@@ -105,10 +111,7 @@ class FaqViewfaqs extends JView
 					JToolBarHelper::unarchiveList('faqs.publish');
 				}
 			}
-		}
 
-		if ($canDo->get('core.edit.state'))
-		{
 			JToolBarHelper::checkin('faqs.checkin');
 		}
 
@@ -123,6 +126,82 @@ class FaqViewfaqs extends JView
 			JToolBarHelper::divider();
 		}
 
+		if (FaqHelper::checkJoomla())
+		{
+			// Get the toolbar object instance
+			$bar = JToolBar::getInstance('toolbar');
+
+			// Add a batch button
+			if ($canDo->get('core.edit'))
+			{
+				JHtml::_('bootstrap.modal', 'collapseModal');
+				$title = JText::_('JTOOLBAR_BATCH');
+				$dhtml = "<button data-toggle=\"modal\" data-target=\"#collapseModal\" class=\"btn btn-small\">
+							<i class=\"icon-checkbox-partial\" title=\"$title\"></i>
+							$title</button>";
+				$bar->appendButton('Custom', $dhtml, 'batch');
+			}
+		}
+
 		JToolBarHelper::help('faqs', $com = true);
+
+		if (FaqHelper::checkJoomla())
+		{
+			$this->addFilters();
+		}
+	}
+
+	/**
+	 * Add the page filters
+	 *
+	 * @since 3.0
+	 */
+	protected function addFilters()
+	{
+		JHtmlSidebar::setAction('index.php?option=com_faq&view=faqs');
+
+		JHtmlSidebar::addFilter(
+			JText::_('JOPTION_SELECT_PUBLISHED'),
+			'filter_published',
+			JHtml::_('select.options', JHtml::_('jgrid.publishedOptions'), 'value', 'text', $this->state->get('filter.published'), true)
+		);
+
+		JHtmlSidebar::addFilter(
+			JText::_('JOPTION_SELECT_CATEGORY'),
+			'filter_category_id',
+			JHtml::_('select.options', JHtml::_('category.options', 'com_faq'), 'value', 'text', $this->state->get('filter.category_id'))
+		);
+
+		JHtmlSidebar::addFilter(
+			JText::_('JOPTION_SELECT_ACCESS'),
+			'filter_access',
+			JHtml::_('select.options', JHtml::_('access.assetgroups'), 'value', 'text', $this->state->get('filter.access'))
+		);
+
+		JHtmlSidebar::addFilter(
+			JText::_('JOPTION_SELECT_LANGUAGE'),
+			'filter_language',
+			JHtml::_('select.options', JHtml::_('contentlanguage.existing', true, true), 'value', 'text', $this->state->get('filter.language'))
+		);
+	}
+
+	/**
+	 * Returns an array of fields the table can be sorted by
+	 *
+	 * @return  array  Array containing the field name to sort by as the key and display text as value
+	 *
+	 * @since   3.0
+	 */
+	protected function getSortFields()
+	{
+		return array(
+			'a.ordering' => JText::_('JGRID_HEADING_ORDERING'),
+			'a.published' => JText::_('JSTATUS'),
+			'a.title' => JText::_('COM_FAQ_HEADING_TITLE'),
+			'a.access' => JText::_('JGRID_HEADING_ACCESS'),
+			'a.hits' => JText::_('JGLOBAL_HITS'),
+			'a.language' => JText::_('JGRID_HEADING_LANGUAGE'),
+			'a.id' => JText::_('JGRID_HEADING_ID')
+		);
 	}
 }

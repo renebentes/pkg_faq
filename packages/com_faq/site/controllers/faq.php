@@ -20,9 +20,41 @@ jimport('joomla.application.component.controllerform');
  */
 class FaqControllerFaq extends JControllerForm
 {
+	/**
+	 * The URL view item variable.
+	 *
+	 * @var    string
+	 */
 	protected $view_item = 'form';
 
+	/**
+	 * The URL view list variable.
+	 *
+	 * @var    string
+	 */
 	protected $view_list = 'categories';
+
+	/**
+	 * Variable declaration for compatibility with future versions
+	 *
+	 * @var JInput
+	 */
+	protected $input;
+
+	/**
+ 	 * Constructor
+ 	 *
+ 	 * @param   array  $config  An optional associative array of configuration settings.
+ 	 *
+ 	 * @see     JControllerLegacy
+ 	 * @since   2.5
+ 	*/
+	public function __construct($config = array())
+	{
+		$this->input = JFactory::getApplication()->input;
+
+		parent::__construct($config);
+	}
 
 	/**
 	 * Method to add a new record.
@@ -53,13 +85,13 @@ class FaqControllerFaq extends JControllerForm
 	{
 		// Initialise variables.
 		$user       = JFactory::getUser();
-		$categoryId = JArrayHelper::getValue($data, 'catid', JRequest::getInt('id'), 'int');
+		$categoryId = JArrayHelper::getValue($data, 'catid', $this->input->getInt('catid'), 'int');
 		$allow      = null;
 
 		if ($categoryId)
 		{
 			// If the category has been passed in the URL check it.
-			$allow = $user->authorise('core.create', $this->option . '.category.' . $categoryId);
+			$allow = $user->authorise('core.create', 'com_faq.category.' . $categoryId);
 		}
 
 		if ($allow === null)
@@ -85,24 +117,41 @@ class FaqControllerFaq extends JControllerForm
 	 */
 	protected function allowEdit($data = array(), $key = 'id')
 	{
-		$recordId   = (int) isset($data[$key]) ? $data[$key] : 0;
-		$categoryId = 0;
+		// Initialise variables.
+		$recordId = (int) isset($data[$key]) ? $data[$key] : 0;
+		$user     = JFactory::getUser();
+		$userId   = $user->get('id');
+		$asset    = 'com_faq.faq.' . $recordId;
 
-		if ($recordId)
-		{
-			$categoryId = (int) $this->getModel()->getItem($recordId)->catid;
+		// Check general edit permission first.
+		if ($user->authorise('core.edit', $asset)) {
+			return true;
 		}
 
-		if ($categoryId)
-		{
-			// The category has been set. Check the category permissions.
-			return JFactory::getUser()->authorise('core.edit', $this->option . '.category.' . $categoryId);
+		// Fallback on edit.own.
+		// First test if the permission is available.
+		if ($user->authorise('core.edit.own', $asset)) {
+			// Now test the owner is the user.
+			$ownerId = (int) isset($data['created_by']) ? $data['created_by'] : 0;
+			if (empty($ownerId) && $recordId) {
+				// Need to do a lookup from the model.
+				$record = $this->getModel()->getItem($recordId);
+
+				if (empty($record)) {
+					return false;
+				}
+
+				$ownerId = $record->created_by;
+			}
+
+			// If the owner matches 'me' then do the test.
+			if ($ownerId == $userId) {
+				return true;
+			}
 		}
-		else
-		{
-			// Since there is no asset tracking, revert to the component permissions.
-			return parent::allowEdit($data, $key);
-		}
+
+		// Since there is no asset tracking, revert to the component permissions.
+		return parent::allowEdit($data, $key);
 	}
 
 	/**
@@ -170,7 +219,7 @@ class FaqControllerFaq extends JControllerForm
 	protected function getRedirectToItemAppend($recordId = null, $urlVar = 'f_id')
 	{
 		$append = parent::getRedirectToItemAppend($recordId, $urlVar);
-		$itemId = JRequest::getInt('Itemid');
+		$itemId = $this->input->getInt('Itemid');
 		$return = $this->getReturnPage();
 
 		if ($itemId)
@@ -180,7 +229,7 @@ class FaqControllerFaq extends JControllerForm
 
 		if ($return)
 		{
-			$append .= '&return=' . base64_encode(urlencode($return));
+			$append .= '&return=' . base64_encode($return);
 		}
 
 		return $append;
@@ -197,15 +246,15 @@ class FaqControllerFaq extends JControllerForm
 	 */
 	protected function getReturnPage()
 	{
-		$return = JRequest::getVar('return', null, 'default', 'base64');
+		$return = $this->input->get('return', null, 'base64');
 
-		if (empty($return) || !JUri::isInternal(urldecode(base64_decode($return))))
+		if (empty($return) || !JUri::isInternal(base64_decode($return)))
 		{
-			return JURI::base();
+			return JUri::base();
 		}
 		else
 		{
-			return urldecode(base64_decode($return));
+			return base64_decode($return);
 		}
 	}
 
@@ -252,25 +301,87 @@ class FaqControllerFaq extends JControllerForm
 		return $result;
 	}
 
+	/**
+	 * Method to save the submitted hit values for records via AJAX.
+	 *
+	 * @return  void
+	 *
+	 * @since   2.5
+	 */
+	public function saveHitAjax()
+	{
+		// Get the input.
+		$id = $this->input->getInt('Itemid');
+
+		// Get the model.
+		$model = $this->getModel('Faq', 'FaqModel');
+
+		// Save the hit.
+		$return = $model->hit($id);
+
+		if ($return)
+		{
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select($db->quoteName('hits'));
+			$query->from($db->quoteName('#__faq'));
+			$query->where($db->quoteName('id') .' = ' . (int) $id);
+			$db->setQuery($query);
+			$hits = $db->loadResult();
+
+			$response = array(
+				'status' => '1',
+				'message' => JText::sprintf('COM_FAQ_HITS', $hits)
+			);
+			echo json_encode($response);
+		}
+
+		JFactory::getApplication()->close();
+	}
+
+	public function saveRatingAjax()
+	{
+		// Get the input.
+		$id = $this->input->getInt('Itemid');
+		$like = $this->input->getInt('like');
+
+		// Get the model.
+		$model = $this->getModel('Faq', 'FaqModel');
+
+		// Save the rating.
+		$return = $model->rating($id);
+
+		if ($return)
+		{
+			echo "1";
+		}
+
+		JFactory::getApplication()->close();
+	}
+
+	/**
+	 * Method to submit a record for guests
+	 *
+	 * @return  Boolean  True if successful, false otherwise.
+	 *
+	 * @since 2.5
+	 */
 	public function submit()
 	{
 		// Check for request forgeries.
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
 
 		// Initialise variables.
-		$app     = JFactory::getApplication();
-		$lang    = JFactory::getLanguage();
-		$data    = JRequest::getVar('jform', array(), 'post', 'array');
-		$model   = $this->getModel('Form', 'FaqModel');
+		$app   = JFactory::getApplication();
+		$lang  = JFactory::getLanguage();
+		$data  = $this->input->post->get('jform', array(), 'array');
+		$model = $this->getModel('Form', 'FaqModel');
 
 		// Validate the posted data.
-		// Sometimes the form needs some posted data, such as for plugins and modules.
-		$form = $model->getForm($data, false);
-
+		$form = $model->getForm();
 		if (!$form)
 		{
-			$app->enqueueMessage($model->getError(), 'error');
-
+			JError::raiseError(500, $model->getError());
 			return false;
 		}
 
@@ -296,10 +407,13 @@ class FaqControllerFaq extends JControllerForm
 				}
 			}
 
-			// Redirect back to the edit screen.
+			// Save the data in the session.
+			$app->setUserState('com_faq.faq.data', $data);
+
+			// Redirect back to the faq form.
 			$this->setRedirect(
 				JRoute::_(
-					'index.php?option=' . $this->option . '&view=' . $this->view, false
+					'index.php?option=com_faq&view=category', false
 				)
 			);
 
@@ -309,13 +423,16 @@ class FaqControllerFaq extends JControllerForm
 		// Attempt to save the data.
 		if (!$model->save($validData))
 		{
-			// Redirect back to the edit screen.
 			$this->setError(JText::sprintf('JLIB_APPLICATION_ERROR_SAVE_FAILED', $model->getError()));
 			$this->setMessage($this->getError(), 'error');
 
+			// Save the data in the session.
+			$app->setUserState('com_faq.faq.data', $data);
+
+			// Redirect back to the faq form.
 			$this->setRedirect(
 				JRoute::_(
-					'index.php?option=' . $this->option . '&view=' . $this->view, false
+					'index.php?option=com_faq&view=category', false
 				)
 			);
 
@@ -331,7 +448,7 @@ class FaqControllerFaq extends JControllerForm
 
 		$this->setRedirect(
 				JRoute::_(
-					'index.php?option=' . $this->option . '&view=' . $this->view, false
+					'index.php?option=com_faq&view=category', false
 				)
 			);
 

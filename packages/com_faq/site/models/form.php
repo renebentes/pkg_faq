@@ -163,26 +163,4 @@ class FaqModelForm extends FaqModelFaq
 	{
 		return base64_encode(urlencode($this->getState('return_page')));
 	}
-
-
-	/**
-	 * Method to increment the hit counter for the faq
-	 *
-	 * @param   int  $id  Optional ID of the faq.
-	 *
-	 * @return  boolean  True on success
-	 *
-	 * @since   2.5
-	 */
-	public function hit($id = 0)
-	{
-		if (empty($id))
-		{
-			$id = $this->getState('faq.id');
-		}
-
-		$table = $this->getTable();
-
-		return $table->hit($id);
-	}
 }

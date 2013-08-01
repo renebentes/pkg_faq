@@ -9,18 +9,14 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-// Get the input.
-$input = JFactory::getApplication()->input;
-
 // Access check.
 if (!JFactory::getUser()->authorise('core.manage', 'com_faq'))
 {
 	return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
 }
 
-// Register dependent classes.
-JLoader::register('FaqHelper', __DIR__ . '/helpers/faq.php');
+require_once JPATH_COMPONENT . '/helpers/faq.php';
 
 $controller = JControllerLegacy::getInstance('Faq');
-$controller->execute($input->get('task'));
+$controller->execute(JFactory::getApplication()->input->get('task'));
 $controller->redirect();

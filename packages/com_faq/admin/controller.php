@@ -25,6 +25,28 @@ class FaqController extends JControllerLegacy
 	protected $default_view = 'cpanel';
 
 	/**
+	 * Variable declaration for compatibility with future versions
+	 *
+	 * @var JInput
+	 */
+	protected $input;
+
+	/**
+ 	 * Constructor
+ 	 *
+ 	 * @param   array  $config  An optional associative array of configuration settings.
+ 	 *
+ 	 * @see     JControllerLegacy
+ 	 * @since   2.5
+ 	*/
+	public function __construct($config = array())
+	{
+		$this->input = JFactory::getApplication()->input;
+
+		parent::__construct($config);
+	}
+
+	/**
 	 * Method to display a view.
 	 *
 	 * @param   boolean  $cachable   If true, the view output will be cached.
@@ -36,6 +58,8 @@ class FaqController extends JControllerLegacy
 	 */
 	public function display($cachable = false, $urlparams = false)
 	{
+		require_once JPATH_COMPONENT . '/helpers/faq.php';
+
 		parent::display();
 
 		return $this;

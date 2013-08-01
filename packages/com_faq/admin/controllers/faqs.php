@@ -22,21 +22,24 @@ jimport('joomla.application.component.controlleradmin');
 class FaqControllerFaqs extends JControllerAdmin
 {
 	/**
-	 * @var		string	The prefix to use with controller messages.
-	 * @since	2.5
+	 * Variable declaration for compatibility with future versions
+	 *
+	 * @var JInput
 	 */
-	protected $text_prefix = 'COM_FAQ_FAQS';
+	protected $input;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param   array  $config  An optional associative array of configuration settings.
-     *
-	 * @see     JController
-	 * @since   2.5
-	 */
+ 	 * Constructor
+ 	 *
+ 	 * @param   array  $config  An optional associative array of configuration settings.
+ 	 *
+ 	 * @see     JControllerLegacy
+ 	 * @since   2.5
+ 	*/
 	public function __construct($config = array())
 	{
+		$this->input = JFactory::getApplication()->input;
+
 		parent::__construct($config);
 	}
 
@@ -56,5 +59,36 @@ class FaqControllerFaqs extends JControllerAdmin
 		$model = parent::getModel($name, $prefix, $config);
 
 		return $model;
+	}
+
+	/**
+	 * Method to save the submitted ordering values for records via AJAX.
+	 *
+	 * @return  void
+	 *
+	 * @since   3.0
+	 */
+	public function saveOrderAjax()
+	{
+		$pks = $this->input->post->get('cid', array(), 'array');
+		$order = $this->input->post->get('order', array(), 'array');
+
+		// Sanitize the input
+		JArrayHelper::toInteger($pks);
+		JArrayHelper::toInteger($order);
+
+		// Get the model
+		$model = $this->getModel();
+
+		// Save the ordering
+		$return = $model->saveorder($pks, $order);
+
+		if ($return)
+		{
+			echo "1";
+		}
+
+		// Close the application
+		JFactory::getApplication()->close();
 	}
 }

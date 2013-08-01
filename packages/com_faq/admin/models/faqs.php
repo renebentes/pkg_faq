@@ -37,14 +37,18 @@ class FaqModelFaqs extends JModelList
 				'id', 'a.id',
 				'title', 'a.title',
 				'alias', 'a.alias',
-				'featured', 'a.featured',
-				'published', 'a.published',
+				'checked_out', 'a.checked_out',
+				'checked_out_time', 'a.checked_out_time',
 				'catid', 'a.catid', 'category_title',
-				'ordering', 'a.ordering',
+				'published', 'a.published',
 				'access', 'a.access', 'access_level',
 				'created', 'a.created',
 				'created_by', 'a.created_by',
+				'ordering', 'a.ordering',
 				'language', 'a.language',
+				'hits', 'a.hits',
+				'publish_up', 'a.publish_up',
+				'publish_down', 'a.publish_down',
 			);
 		}
 
@@ -81,10 +85,10 @@ class FaqModelFaqs extends JModelList
 		$accessId = $this->getUserStateFromRequest($this->context . '.filter.access', 'filter_access', null, 'int');
 		$this->setState('filter.access', $accessId);
 
-		$published = $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', '');
+		$published = $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', '', 'string');
 		$this->setState('filter.published', $published);
 
-		$categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id');
+		$categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id', '');
 		$this->setState('filter.category_id', $categoryId);
 
 		$language = $this->getUserStateFromRequest($this->context . '.filter.language', 'filter_language', '');
@@ -141,9 +145,10 @@ class FaqModelFaqs extends JModelList
 		$query->select(
 			$this->getState(
 				'list.select',
-				'a.id, a.catid, a.title, a.alias, a.ordering, ' .
-				'a.published, a.access, a.language, a.checked_out, ' .
-				'a.checked_out_time, a.publish_up, a.publish_down'
+				'a.id, a.title, a.alias, a.catid, a.hits, ' .
+				'a.published, a.access, a.ordering, a.language, '.
+				'a.checked_out, a.checked_out_time, a.publish_up, '.
+				'a.publish_down'
 			)
 		);
 		$query->from($db->quoteName('#__faq') . ' AS a');
@@ -189,7 +194,7 @@ class FaqModelFaqs extends JModelList
 		}
 		elseif ($published === '')
 		{
-			$query->where('(a.published = 0 OR a.published = 1)');
+			$query->where('a.published IN (0, 1)');
 		}
 
 		// Filter by a single or group of categories.
@@ -198,12 +203,12 @@ class FaqModelFaqs extends JModelList
 		{
 			$query->where('a.catid = ' . (int) $categoryId);
 		}
-		elseif (is_array($categoryId))
+		/*elseif (is_array($categoryId))
 		{
 			JArrayHelper::toInteger($categoryId);
 			$categoryId = implode(',', $categoryId);
 			$query->where('a.catid IN (' . $categoryId . ')');
-		}
+		}*/
 
 		// Filter by search in title.
 		$search = $this->getState('filter.search');
@@ -227,8 +232,8 @@ class FaqModelFaqs extends JModelList
 		}
 
 		// Add the list ordering clause.
-		$orderCol  = $this->state->get('list.ordering', 'a.title');
-		$orderDirn = $this->state->get('list.direction', 'asc');
+		$orderCol  = $this->state->get('list.ordering');
+		$orderDirn = $this->state->get('list.direction');
 		if ($orderCol == 'a.ordering' || $orderCol == 'category_title')
 		{
 			$orderCol = 'c.title ' . $orderDirn . ', a.ordering';

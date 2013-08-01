@@ -1,3 +1,4 @@
+-- 1.0
 CREATE TABLE IF NOT EXISTS `#__faq` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `catid` int(10) unsigned NOT NULL DEFAULT '0',
@@ -29,4 +30,12 @@ CREATE TABLE IF NOT EXISTS `#__faq` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+-- 1.2
 ALTER TABLE `#__faq` CHANGE COLUMN `state` `published` tinyint(3) NOT NULL DEFAULT '0';
+
+-- 1.3
+ALTER TABLE `#__faq` DROP COLUMN `xreference`;
+ALTER TABLE `#__faq` DROP COLUMN `featured`;
+
+-- 1.4
+ALTER TABLE `#__faq` ADD COLUMN `writer` text NOT NULL AFTER `metadata`;

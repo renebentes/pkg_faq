@@ -40,7 +40,7 @@ $canDo = FaqHelper::getActions();
 <form action="<?php echo JRoute::_('index.php?option=com_faq&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="faq-form" class="form-validate">
 	<div class="width-60 fltlft">
 		<fieldset class="adminform">
-			<legend><?php echo empty($this->item->id) ? JText::_('COM_FAQ_FAQ_ADD') : JText::sprintf('COM_FAQ_FAQ_EDIT', $this->item->id); ?></legend>
+			<legend><?php echo empty($this->item->id) ? JText::_('COM_FAQ_FAQ_ADD') : JText::sprintf('COM_FAQ_FAQ_EDIT', $this->item->id, true); ?></legend>
 			<ul class="adminformlist">
 				<li><?php echo $this->form->getLabel('title'); ?>
 				<?php echo $this->form->getInput('title'); ?></li>
@@ -76,6 +76,7 @@ $canDo = FaqHelper::getActions();
 	<div class="width-40 fltrt">
 		<?php echo JHtml::_('sliders.start', 'faq-sliders-' . $this->item->id, array('useCookie' => 1)); ?>
 		<?php echo $this->loadTemplate('publish'); ?>
+		<?php echo $this->loadTemplate('images'); ?>
 		<?php echo $this->loadTemplate('params'); ?>
 		<?php echo $this->loadTemplate('metadata'); ?>
 		<?php echo $this->loadTemplate('writer'); ?>

@@ -9,8 +9,6 @@
 // No direct access.
 defined('_JEXEC') or die;
 
-jimport('joomla.application.component.view');
-
 /**
  * View to edit a Faq.
  *
@@ -18,7 +16,7 @@ jimport('joomla.application.component.view');
  * @subpackage  com_faq
  * @since       2.5
  */
-class FaqViewFaq extends JView
+class FaqViewFaq extends JViewLegacy
 {
 	protected $form;
 
@@ -49,6 +47,13 @@ class FaqViewFaq extends JView
 			return false;
 		}
 
+		// Set layout for Joomla! 3.x
+		$layout = $this->getLayout();
+		if (FaqHelper::checkJoomla())
+		{
+			$this->setLayout($layout . '30');
+		}
+
 		$this->addToolbar();
 
 		parent::display($tpl);
@@ -63,32 +68,32 @@ class FaqViewFaq extends JView
 	 */
 	protected function addToolbar()
 	{
-		JRequest::setVar('hidemainmenu', true);
+		JFactory::getApplication()->input->set('hidemainmenu', true);
 
-		$user	= JFactory::getUser();
-		$userId	= $user->get('id');
-		$isNew	= ($this->item->id == 0);
+		$user       = JFactory::getUser();
+		$userId     = $user->get('id');
+		$isNew      = ($this->item->id == 0);
 		$checkedOut = !($this->item->checked_out == 0 || $this->item->checked_out == $userId);
 
 		// Since we don't track these assets at the item level, use the category id.
 		$canDo	= FaqHelper::getActions($this->item->catid, 0);
 
-		JToolBarHelper::title($isNew ? JText::_('COM_FAQ_FAQ_ADD') : JText::_('COM_FAQ_FAQ_EDIT'), 'faq.png');
+		JToolBarHelper::title(JText::_('COM_FAQ_MANAGER_FAQ'), 'faqs.png');
 
 		// If not checked out, can save the item.
-		if (!$checkedOut && ($canDo->get('core.edit') || count($user->getAuthorisedCategories('com_faq', 'core.create')) > 0))
+		if (!$checkedOut && ($canDo->get('core.edit') || (count($user->getAuthorisedCategories('com_faq', 'core.create')))))
 		{
 			JToolBarHelper::apply('faq.apply');
 			JToolBarHelper::save('faq.save');
 
-			if ($canDo->get('core.create'))
+			if (!$checkedOut && (count($user->getAuthorisedCategories('com_faq', 'core.create'))))
 			{
 				JToolBarHelper::save2new('faq.save2new');
 			}
 		}
 
 		// If an existing item, can save to a copy.
-		if (!$isNew && $canDo->get('core.create'))
+		if (!$isNew && count($user->getAuthorisedCategories('com_faq', 'core.create')) > 0)
 		{
 			JToolBarHelper::save2copy('faq.save2copy');
 		}

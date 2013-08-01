@@ -12,7 +12,6 @@ defined('_JEXEC') or die;
 /**
  * HTML Faq View class for the Faq component
  *
- * @static
  * @package     Faq
  * @subpackage  com_faq
  * @since       2.5
@@ -43,7 +42,7 @@ class FaqViewFaq extends JViewLegacy
 
 		// Get view related request variables.
 		$this->item  = $this->get('Item');
-		$this->print = JRequest::getBool('print');
+		$this->print = $app->input->getBool('print');
 		$this->state = $this->get('State');
 		$this->user  = $user;
 
@@ -56,24 +55,31 @@ class FaqViewFaq extends JViewLegacy
 		}
 
 		// Create a shortcut for $item.
-		$item = &$this->item;
+		$item = $this->item;
 
 		// Add router helpers.
-		$item->slug			= $item->alias ? ($item->id . ':' .$item->alias) : $item->id;
+		$item->slug			= $item->alias ? ($item->id . ':' . $item->alias) : $item->id;
 		$item->catslug		= $item->category_alias ? ($item->catid . ':' . $item->category_alias) : $item->catid;
 		$item->parent_slug	= $item->category_alias ? ($item->parent_id . ':' . $item->parent_alias) : $item->parent_id;
+
+		// No link for ROOT category
+		if ($item->parent_alias == 'root')
+		{
+			$item->parent_slug = null;
+		}
 
 		// Merge faq params. If this is single-faq view, menu params override faq params
 		// Otherwise, faq params override menu item params
 		$this->params = $this->state->get('params');
-		$temp         = clone ($this->params);
-
+		$temp   = clone ($this->params);
 		$active = $app->getMenu()->getActive();
+
 		// Check to see which parameters should take priority
 		if ($active)
 		{
+			$currentLink = $active->link;
 			// If the current view is the active item and an faq view for this faq, then the menu item params take priority
-			if (strpos($active->link, 'view=faq') && (strpos($active->link, '&id=' . (string) $item->id)))
+			if (strpos($currentLink, 'view=faq') && (strpos($currentLink, '&id=' . (string) $item->id)))
 			{
 				// $item->params are the faq params, $temp are the menu item params
 				// Merge so that the menu item params take priority
@@ -104,9 +110,11 @@ class FaqViewFaq extends JViewLegacy
 			// Merge so that faq params take priority
 			$temp->merge($item->params);
 			$item->params = $temp;
+
 			// Check for alternative layouts (since we are not in a single-faq menu item)
 			// Single-faq menu item layout takes priority over alt layout for an faq
-			if ($layout = $item->params->get('faq_layout')) {
+			if ($layout = $item->params->get('faq_layout'))
+			{
 				$this->setLayout($layout);
 			}
 		}
