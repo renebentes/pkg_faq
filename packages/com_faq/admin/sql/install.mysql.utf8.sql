@@ -39,3 +39,13 @@ ALTER TABLE `#__faq` DROP COLUMN `featured`;
 
 -- 1.4
 ALTER TABLE `#__faq` ADD COLUMN `writer` text NOT NULL AFTER `metadata`;
+
+-- 1.5
+CREATE TABLE IF NOT EXISTS `#__faq_rating` (
+  `faq_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `vote_up` int(10) unsigned NOT NULL DEFAULT '0',
+  `vote_down` int(10) unsigned NOT NULL DEFAULT '0',
+  `last_ip` varchar(50) NOT NULL DEFAULT '',
+  PRIMARY KEY (`faq_id`),
+  FOREIGN KEY (`faq_id`) REFERENCES `#__faq` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

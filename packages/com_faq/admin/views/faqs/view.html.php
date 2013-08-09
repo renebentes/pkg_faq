@@ -74,6 +74,8 @@ class FaqViewfaqs extends JViewLegacy
 	 */
 	protected function addToolbar()
 	{
+		require_once JPATH_COMPONENT_ADMINISTRATOR . '/helpers/html/toolbar.php';
+
 		$state = $this->get('State');
 		$canDo = FaqHelper::getActions($state->get('filter.category_id'));
 		$user  = JFactory::getUser();
@@ -128,18 +130,10 @@ class FaqViewfaqs extends JViewLegacy
 
 		if (FaqHelper::checkJoomla())
 		{
-			// Get the toolbar object instance
-			$bar = JToolBar::getInstance('toolbar');
-
 			// Add a batch button
 			if ($canDo->get('core.edit'))
 			{
-				JHtml::_('bootstrap.modal', 'collapseModal');
-				$title = JText::_('JTOOLBAR_BATCH');
-				$dhtml = "<button data-toggle=\"modal\" data-target=\"#collapseModal\" class=\"btn btn-small\">
-							<i class=\"icon-checkbox-partial\" title=\"$title\"></i>
-							$title</button>";
-				$bar->appendButton('Custom', $dhtml, 'batch');
+				FaqToolBarHelper::batch();
 			}
 		}
 

@@ -341,22 +341,43 @@ class FaqControllerFaq extends JControllerForm
 
 	public function saveRatingAjax()
 	{
+		$app = JFactory::getApplication();
 		// Get the input.
-		$id = $this->input->getInt('Itemid');
-		$like = $this->input->getInt('like');
+		$id   = $this->input->getInt('Itemid');
+		$rate = $this->input->get('rate');
 
 		// Get the model.
 		$model = $this->getModel('Faq', 'FaqModel');
 
 		// Save the rating.
-		$return = $model->rating($id);
+		$return = $model->rating($id, $rate);
 
 		if ($return)
 		{
-			echo "1";
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select($db->quoteName('vote_' . $rate));
+			$query->from($db->quoteName('#__faq_rating'));
+			$query->where($db->quoteName('faq_id') .' = ' . (int) $id);
+			$db->setQuery($query);
+			$vote = $db->loadResult();
+
+			$response = array(
+				'status' => '1',
+				'message' => $vote
+			);
+			echo json_encode($response);
+		}
+		else
+		{
+			$response = array(
+				'status' => '0',
+				'message' => $model->getError()
+			);
+			echo json_encode($response);
 		}
 
-		JFactory::getApplication()->close();
+		$app->close();
 	}
 
 	/**

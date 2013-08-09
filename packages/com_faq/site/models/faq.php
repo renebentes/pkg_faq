@@ -267,13 +267,13 @@ class FaqModelFaq extends JModelItem
 	}
 
 	/**
-	 * Method to increment the hit counter for the faq
+	 * Increment the hit counter for the faq
 	 *
-	 * @param   int  $id  Optional ID of the faq.
+	 * @param  integer $id Optional primary key of the faq to increment.
 	 *
-	 * @return  boolean  True on success
+	 * @return boolean      True if successful; false otherwise and internal error set.
 	 *
-	 * @since   2.5
+	 * @since  2.5
 	 */
 	public function hit($id = 0)
 	{
@@ -285,5 +285,95 @@ class FaqModelFaq extends JModelItem
 		$table = $this->getTable('Faq', 'FaqTable');
 
 		return $table->hit($id);
+	}
+
+	/**
+	 * Method to classify faqs
+	 *
+	 * @param  integer $id   Primary key for the rating faq.
+	 * @param  string  $rate Rating for the faq.
+	 *
+	 * @return boolean       True if successful; false otherwise and internal error set.
+	 *
+	 * @since  2.5
+	 */
+	public function rating($id = 0, $rate = '')
+	{
+		if ($id > 0 && $rate != '')
+		{
+			$userIP = $_SERVER['REMOTE_ADDR'];
+			$db = $this->getDbo();
+			$query = $db->getQuery(true);
+			$query->select('*');
+			$query->from($db->quoteName('#__faq_rating'));
+			$query->where($db->quoteName('faq_id') . ' = ' . (int) $id);
+			$db->setQuery($query);
+
+			$rating = $db->loadObject();
+
+			if(!$rating)
+			{
+				$query = $db->getQuery(true);
+				$query->insert($db->quoteName('#__faq_rating'));
+				$query->columns($db->quoteName('faq_id') . ', ' . $db->quoteName('vote_up') . ', ' . $db->quoteName('vote_down') . ', ' . $db->quoteName('last_ip'));
+				if ($rate == 'up')
+				{
+					$query->values($id . ', ' .  1 . ', ' .  0 . ', ' . $db->quote($userIP));
+				}
+				elseif ($rate == 'down')
+				{
+					$query->values($id . ', ' .  0 . ', ' .  1 . ', ' . $db->quote($userIP));
+				}
+				$db->setQuery($query);
+
+				try
+				{
+					$db->execute();
+				}
+				catch (RuntimeException $e)
+				{
+					$this->setError($e->getMessage);
+					return false;
+				}
+			}
+			else
+			{
+				if ($userIP != $rating->last_ip)
+				{
+					$query = $db->getQuery(true);
+					$query->update($db->quoteName('#__faq_rating'));
+					$query->set($db->quoteName('last_ip') . ' = ' . $db->quote($userIP));
+					if ($rate == 'up')
+					{
+						$query->set($db->quoteName('vote_up') . ' = ' . $db->quoteName('vote_up') . ' + 1');
+					}
+					elseif ($rate == 'down')
+					{
+						$query->set($db->quoteName('vote_down') . ' = ' . $db->quoteName('vote_down') . ' + 1');
+					}
+					$query->where($db->quoteName('#faq_id') . ' = ' . (int) $id);
+					$db->setQuery($query);
+
+					try
+					{
+						$db->execute();
+					}
+					catch (RuntimeException $e)
+					{
+						$this->setError($e->getMessage);
+						return false;
+					}
+				}
+				else
+				{
+					$this->setError(JText::_('COM_FAQ_ERROR_LASTIP_ALREADY_RATING'));
+					return false;
+				}
+			}
+			return true;
+		}
+
+		$this->setError('SOME_ERROR_CODE', JText::sprintf('COM_FAQ_ERROR_INVALID_RATING', $rate), "JModelFaq::rating($id, $rate)");
+		return false;
 	}
 }

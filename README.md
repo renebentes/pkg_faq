@@ -32,7 +32,7 @@ TODO
 ----
 
 * Visualizações no frontend
-* Acrescentar mecanismo de votação
+* Checar gerações de erro do Joomla!
 
 Release Notes
 -------------
@@ -46,6 +46,7 @@ Release Notes
 	! Relevant Message
 
 ######1.5
+	+ Mecanismo de votação de FAQs.
 	^ Extensão compatível com Joomla 2.5.x e 3.x
 	+ Função para ativação automática de subextensões durante a instalação/atualização
 	+ Módulo para exibição de FAQs mais populares no backend

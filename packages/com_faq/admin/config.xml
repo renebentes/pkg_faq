@@ -65,6 +65,11 @@
 			<option value="0">JHIDE</option>
 			<option value="1">JSHOW</option>
 		</field>
+
+		<field name="show_rating" type="radio" label="JGLOBAL_SHOW_VOTE_LABEL" description="COM_FAQ_SHOW_RATING_DESC" default="1">
+			<option value="0">JHIDE</option>
+			<option value="1">JSHOW</option>
+		</field>
 	</fieldset>
 
 	<fieldset name="category" label="COM_FAQ_CATEGORY_SETTINGS_LABEL" description="COM_FAQ_CATEGORY_SETTINGS_DESC">

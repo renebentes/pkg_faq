@@ -38,7 +38,6 @@ class FaqViewCategory extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$app    = JFactory::getApplication();
-		$params		= $app->getParams();
 
 		// Get some data from the models
 		$state      = $this->get('State');

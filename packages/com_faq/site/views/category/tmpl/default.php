@@ -36,7 +36,7 @@ $doc->addStyleSheet(JURI::root() . 'media/com_faq/css/frontend.css');
 		</div>
 	<?php endif; ?>
 
-	<?php if ($this->params->get('show_description') || ($this->params->get('show_description_image') && $this->category->getParams()->get('image'))) : ?>
+	<?php if (($this->params->get('show_description') && $this->category->description) || ($this->params->get('show_description_image') && $this->category->getParams()->get('image'))) : ?>
 	<div class="category-desc well well-small">
 		<div class="media">
 			<?php if ($this->params->get('show_description_image') && $this->category->getParams()->get('image')) : ?>

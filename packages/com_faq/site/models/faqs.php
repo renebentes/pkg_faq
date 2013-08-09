@@ -182,6 +182,10 @@ class FaqModelFaqs extends JModelList
 
 		$query->from('#__faq AS a');
 
+		// Join over the ratings
+		$query->select('r.vote_up, r.vote_down');
+		$query->join('LEFT', '#__faq_rating AS r ON r.faq_id = a.id');
+
 		// Join over the categories
 		$query->select('c.title AS category_title, c.path AS category_route, c.access AS category_access, c.alias AS category_alias');
 		$query->join('LEFT', '#__categories AS c ON c.id = a.catid');
