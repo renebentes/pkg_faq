@@ -55,18 +55,17 @@ class FaqViewCategory extends JViewLegacy
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
-			JError::raiseError(500, implode("\n", $errors));
-			return false;
+			return new Exception(implode("\n", $errors), 500);
 		}
 
 		if ($category == false)
 		{
-			return JError::raiseError(404, JText::_('JGLOBAL_CATEGORY_NOT_FOUND'));
+			return new Exception(JText::_('JGLOBAL_CATEGORY_NOT_FOUND'), 404);
 		}
 
 		if ($parent == false)
 		{
-			return JError::raiseError(404, JText::_('JGLOBAL_CATEGORY_NOT_FOUND'));
+			return new Exception(JText::_('JGLOBAL_CATEGORY_NOT_FOUND'), 404);
 		}
 
 		// Setup the category parameters.
@@ -80,7 +79,7 @@ class FaqViewCategory extends JViewLegacy
 
 		if (!in_array($category->access, $groups))
 		{
-			return JError::raiseError(403, JText::_('JERROR_ALERTNOAUTHOR'));
+			return new Exception(JText::_('JERROR_ALERTNOAUTHOR'), 403);
 		}
 
 		// Prepare the data.

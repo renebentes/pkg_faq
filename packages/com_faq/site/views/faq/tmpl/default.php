@@ -44,7 +44,7 @@ JHtml::_('behavior.caption');
 	 				<dt class="item-info-term"><?php  echo JText::_('COM_FAQ_INFO'); ?></dt>
 			<?php endif; ?>
 
-			<?php if (($params->get('show_author') && !empty($this->item->author)) || ($params->get('show_parent_category') && $this->item->parent_slug != '1:root') || $params->get('show_category')) : ?>
+			<?php if (($params->get('show_author') && !empty($this->item->author)) || ($params->get('show_parent_category') && !empty($this->item->parent_slug)) || $params->get('show_category')) : ?>
 				<dd>
 					<?php if ($params->get('show_author') && !empty($this->item->author)) : ?>
 						<i class="icon-user"></i>
@@ -57,7 +57,7 @@ JHtml::_('behavior.caption');
 							<?php echo JText::sprintf('COM_FAQ_WRITTEN_BY', $author); ?>
 						<?php endif; ?>
 
-						<?php if ($params->get('show_parent_category') && ($this->item->parent_slug != '1:root' || $this->item->parent_slug != 'ROOT')) : ?>
+						<?php if ($params->get('show_parent_category') && !empty($this->item->parent_slug)) : ?>
 							<i class="icon-tags"></i>
 							<?php $title = $this->escape($this->item->parent_title);
 							$url = '<a href="' . JRoute::_(FaqHelperRoute::getCategoryRoute($this->item->parent_slug)) . '">' . $title . '</a>'; ?>

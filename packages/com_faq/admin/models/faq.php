@@ -230,6 +230,12 @@ class FaqModelFaq extends JModelAdmin
 			$table->alias = JApplication::stringURLSafe($table->title);
 		}
 
+		// Set the publish date to now
+		if ($table->published == 1 && (int) $table->publish_up == 0)
+		{
+			$table->publish_up = $date->toSql();
+		}
+
 		if (empty($table->id))
 		{
 			// Set the values

@@ -79,7 +79,7 @@ class Com_FaqInstallerScript
      */
     function install($parent)
     {
-
+        echo '<p>' . JText::_('COM_FAQ_INSTALL_TEXT') . '</p>';
     }
 
     /**
@@ -89,7 +89,7 @@ class Com_FaqInstallerScript
      */
     function uninstall($parent)
     {
-
+        echo '<p>' . JText::_('COM_FAQ_UNINSTALL_TEXT') . '</p>';
     }
 
     /**
@@ -110,7 +110,7 @@ class Com_FaqInstallerScript
      */
     function preflight($type, $parent)
     {
-        $this->_checkCompatible();
+        $this->_checkCompatible($parent);
 
         // Workaround for JInstaller bugs
         if(in_array($type, array('install','discover_install')))
@@ -144,46 +144,40 @@ class Com_FaqInstallerScript
     /**
      * Method for checking compatibility installation environment
      *
-     * @return bool True if the installation environment is compatible
+     * @param JInstaller    $parent Parent object
+     * @return bool         True if the installation environment is compatible
      */
-    private function _checkCompatible()
+    private function _checkCompatible($parent)
     {
-        // Only allow to install on Joomla! 2.5.0 or later with PHP 5.3.0 or later
-        if(defined('PHP_VERSION'))
-        {
-            $version = PHP_VERSION;
-        }
-        elseif(function_exists('phpversion'))
-        {
-            $version = phpversion();
-        }
-        else
-        {
-            $version = '5.0.0'; // all bets are off!
-        }
+        // Get the application.
+        $app         = JFactory::getApplication();
+        $min_version = (string) $parent->get('manifest')->attributes()->version;
+        $jversion    = new JVersion;
 
-        if(!version_compare(JVERSION, '2.5.6', 'ge'))
+        if (!$jversion->isCompatible($min_version))
         {
-            $msg = '<p>' . JText::_('NO_SUPPORTED_JOOMLA') . '</p>';
-            JError::raiseWarning(100, $msg);
+            $app->enqueueMessage(JText::sprintf('COM_FAQ_VERSION_UNSUPPORTED', $min_version), 'error');
             return false;
         }
 
-        if(!version_compare($version, '5.3.1', 'ge'))
+        if (get_magic_quotes_gpc())
         {
-            $msg = '<p>' . JText::_('NO_SUPPORTED_PHP') . '</p>';
-            if(version_compare(JVERSION, '3.0', 'gt'))
-            {
-                JLog::add($msg, JLog::WARNING, 'jerror');
-            }
-            else
-            {
-                JError::raiseWarning(100, $msg);
-            }
+            $app->enqueueMessage(JText::_('COM_FAQ_MAGIC_QUOTES'), 'error');
             return false;
         }
 
-        return true;
+        // Storing old release number for process in postflight.
+        if ($route == 'update')
+        {
+            $this->oldRelease = $this->getParam('version');
+
+            // Check if update is allowed (only update from 1.0 and higher).
+            if (version_compare($this->oldRelease, '1.0', '<'))
+            {
+                $app->enqueueMessage(JText::sprintf('COM_FAQ_UPDATE_UNSUPPORTED', $this->oldRelease), 'error');
+                return false;
+            }
+        }
     }
 
     /**

@@ -12,7 +12,7 @@ defined('_JEXEC') or die;
 jimport('joomla.application.component.modelitem');
 
 /**
- * Faq Component Faq Model
+ * Faq Component Model for a Faq record
  *
  * @package     faq
  * @subpackage  com_faq
@@ -126,24 +126,27 @@ class FaqModelFaq extends JModelItem
 
 				// Join on contact table
 				$subQuery = $db->getQuery(true)
-					->select('contact.user_id, MAX(contact.id) AS id, contact.language')
+					->select('MAX(contact.id) AS id')
 					->from('#__contact_details AS contact')
 					->where('contact.published = 1')
-					->group('contact.user_id, contact.language');
-
-				$query->select('contact.id as contactid')
-					->join('LEFT', '(' . $subQuery . ') AS contact ON contact.user_id = a.created_by');
+					->where('contact.user_id = a.created_by');
 
 				// Filter by language
 				if ($this->getState('filter.language'))
 				{
+					$subQuery->where('(contact.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ') OR contact.language IS NULL)');
 					$query->where('a.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') .')');
-					$query->where('(contact.language IN (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ') OR contact.language IS NULL)');
 				}
+
+				$query->select('(' . $subQuery . ') as contactid');
 
 				// Join over the categories to get parent category titles
 				$query->select('parent.title AS parent_title, parent.id AS parent_id, parent.path AS parent_route, parent.alias AS parent_alias');
 				$query->join('LEFT', '#__categories AS parent ON parent.id = c.parent_id');
+
+				// Join on rating table
+				$query->select('r.vote_up, r.vote_down')
+					->join('LEFT', '#__faq_rating as r ON r.faq_id = a.id');
 
 				$query->where('a.id = ' . (int) $pk);
 
@@ -175,13 +178,13 @@ class FaqModelFaq extends JModelItem
 				$data = $db->loadObject();
 				if (empty($data))
 				{
-					return JError::raiseError(404, JText::_('COM_FAQ_ERROR_FAQ_NOT_FOUND'));
+					throw new Exception(JText::_('COM_FAQ_ERROR_FAQ_NOT_FOUND'), 404);
 				}
 
 				// Check for published state if filter set.
 				if (((is_numeric($published)) || (is_numeric($archived))) && (($data->published != $published) && ($data->published != $archived)))
 				{
-					return JError::raiseError(404, JText::_('COM_FAQ_ERROR_FAQ_NOT_FOUND'));
+					throw new Exception(JText::_('COM_FAQ_ERROR_FAQ_NOT_FOUND'), 404);
 				}
 
 				// Convert parameter fields to objects.
@@ -248,18 +251,18 @@ class FaqModelFaq extends JModelItem
 
 				$this->_item[$pk] = $data;
 			}
-			catch (JException $e)
+			catch (Exception $e)
 			{
 				if ($e->getCode() == 404)
 				{
 					// Need to go thru the error handler to allow Redirect to work.
-					JError::raiseError(404, $e->getMessage());
+					$this->setError($e->getMessage());
 				}
 				else
 				{
 					$this->setError($e);
-					$this->_item[$pk] = false;
 				}
+				$this->_item[$pk] = false;
 			}
 		}
 

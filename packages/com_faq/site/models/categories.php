@@ -25,7 +25,7 @@ class FaqModelCategories extends JModelList
 	 *
 	 * @var     string
 	 */
-	public $_context = 'com_faq.categories';
+	protected $_context = 'com_faq.categories';
 
 	/**
 	 * The category context (allows other extensions to derived from this model).
@@ -53,7 +53,7 @@ class FaqModelCategories extends JModelList
 		$this->setState('filter.extension', $this->_extension);
 
 		// Get the parent id if defined.
-		$parentId = JRequest::getInt('id');
+		$parentId = $app->input->getInt('id');
 		$this->setState('filter.parentId', $parentId);
 
 		$params = $app->getParams();
@@ -111,7 +111,7 @@ class FaqModelCategories extends JModelList
 			}
 
 			$options = array();
-			$options['countItems'] = $params->get('show_cat_items_cat', 1) || !$params->get('show_empty_categories_cat', 0);
+			$options['countItems'] = $params->get('show_cat_num_items', 1) || !$params->get('show_empty_categories', 0);
 			$categories = JCategories::getInstance('Faq', $options);
 			$this->_parent = $categories->get($this->getState('filter.parentId', 'root'));
 

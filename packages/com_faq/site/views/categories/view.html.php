@@ -43,20 +43,17 @@ class FaqViewCategories extends JViewLegacy
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
-			JError::raiseWarning(500, implode("\n", $errors));
-			return false;
+			return new Exception(implode("\n", $errors), 500);
 		}
 
 		if ($items === false)
 		{
-			JError::raiseError(404, JText::_('JGLOBAL_CATEGORY_NOT_FOUND'));
-			return false;
+			return new Exception(JText::_('JGLOBAL_CATEGORY_NOT_FOUND'), 404);
 		}
 
 		if ($parent == false)
 		{
-			JError::raiseError(404, JText::_('JGLOBAL_CATEGORY_NOT_FOUND'));
-			return false;
+			return new Exception(JText::_('JGLOBAL_CATEGORY_NOT_FOUND'), 404);
 		}
 
 		$params = &$state->params;
@@ -66,7 +63,7 @@ class FaqViewCategories extends JViewLegacy
 		// Escape strings for HTML output
 		$this->pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 
-		$this->maxLevelcat = $params->get('maxLevelcat', -1);
+		$this->maxLevel = $params->get('maxLevel', -1);
 		$this->assignRef('params', $params);
 		$this->assignRef('parent', $parent);
 		$this->assignRef('items', $items);

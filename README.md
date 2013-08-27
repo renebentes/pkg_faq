@@ -11,7 +11,8 @@ Requirements
 ------------
 
 * [Joomla! 2.5+](http://www.joomla.org);
-* Template com [Twitter Bootstrap 2.1.0+](http://www.getbootstrap.com).
+* [Twitter Bootstrap 2.1.0+](http://www.getbootstrap.com).
+* [jQuery 1.8.3+](www.jquery.com)
 
 Author
 ------
@@ -46,6 +47,8 @@ Release Notes
 	! Relevant Message
 
 ######1.5
+	* Correção de script de preparação de tabela para salvamento
+	* Correção no tipo de campo de título para incluir textos mais longos
 	+ Mecanismo de votação de FAQs.
 	^ Extensão compatível com Joomla 2.5.x e 3.x
 	+ Função para ativação automática de subextensões durante a instalação/atualização

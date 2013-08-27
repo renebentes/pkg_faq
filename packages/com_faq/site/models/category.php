@@ -110,7 +110,7 @@ class FaqModelCategory extends JModelList
 	{
 		// Initialise variables.
 		$app	= JFactory::getApplication('site');
-		$pk		= JRequest::getInt('id');
+		$pk		= $app->input->getInt('id');
 
 		$this->setState('category.id', $pk);
 
@@ -153,7 +153,7 @@ class FaqModelCategory extends JModelList
 		}
 
 		// filter.order
-		$itemid = JRequest::getInt('id', 0) . ':' . JRequest::getInt('Itemid', 0);
+		$itemid = $app->input->getInt('id', 0) . ':' . $app->input->getInt('Itemid', 0);
 		$orderCol = $app->getUserStateFromRequest('com_faq.category.list.' . $itemid . '.filter_order', 'filter_order', '', 'string');
 		if (!in_array($orderCol, $this->filter_fields)) {
 			$orderCol = 'a.ordering';
@@ -167,7 +167,7 @@ class FaqModelCategory extends JModelList
 		}
 		$this->setState('list.direction', $listOrder);
 
-		$this->setState('list.start', JRequest::getUInt('limitstart', 0));
+		$this->setState('list.start', $app->input->getUInt('limitstart', 0));
 
 		// Set limit for query
 		$limit = $app->getUserStateFromRequest('com_faq.category.list.' . $itemid . '.limit', 'limit', $params->get('display_num'), 'uint');
@@ -181,9 +181,9 @@ class FaqModelCategory extends JModelList
 			$this->setState('filter.subcategories', true);
 		}
 
-		$this->setState('filter.language', $app->getLanguageFilter());
+		$this->setState('filter.language', JLanguageMultilang::isEnabled());
 
-		$this->setState('layout', JRequest::getCmd('layout'));
+		$this->setState('layout', $app->input->get('layout'));
 	}
 
 	/**
@@ -195,13 +195,12 @@ class FaqModelCategory extends JModelList
 	 */
 	public function getItems()
 	{
-		$params = $this->getState()->get('params');
 		$limit = $this->getState('list.limit');
 
 		if($this->_records === null && $category = $this->getCategory())
 		{
 			$model = JModelLegacy::getInstance('Faqs', 'FaqModel', array('ignore_request' => true));
-			$model->setState('params', $params);
+			$model->setState('params', JFactory::getApplication()->getParams());
 			$model->setState('filter.category_id', $category->id);
 			$model->setState('filter.published', $this->getState('filter.published'));
 			$model->setState('filter.access', $this->getState('filter.access'));
@@ -247,7 +246,7 @@ class FaqModelCategory extends JModelList
 		$app		= JFactory::getApplication('site');
 		$db			= $this->getDbo();
 		$params		= $this->state->params;
-		$itemid		= JRequest::getInt('id', 0) . ':' . JRequest::getInt('Itemid', 0);
+		$itemid		= $app->input->getInt('id', 0) . ':' . $app->input->getInt('Itemid', 0);
 		$orderCol	= $app->getUserStateFromRequest('com_faq.category.list.' . $itemid . '.filter_order', 'filter_order', '', 'string');
 		$orderDirn	= $app->getUserStateFromRequest('com_faq.category.list.' . $itemid . '.filter_order_Dir', 'filter_order_Dir', '', 'cmd');
 		$orderby	= ' ';

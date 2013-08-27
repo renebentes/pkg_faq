@@ -6,3 +6,5 @@ CREATE TABLE IF NOT EXISTS `#__faq_rating` (
   PRIMARY KEY (`faq_id`),
   FOREIGN KEY (`faq_id`) REFERENCES `#__faq` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+ALTER TABLE `#__faq` CHANGE COLUMN `title` NOT NULL DEFAULT '';

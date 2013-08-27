@@ -87,11 +87,11 @@ class plgSearchFaq extends JPlugin
 		$sArchived = $this->params->get('search_archived', 1);
 		$limit     = $this->params->def('search_limit', 50);
 
-		$nullDate		= $db->getNullDate();
-		$date = JFactory::getDate();
-		$now = $date->toSql();
+		$nullDate = $db->getNullDate();
+		$date     = JFactory::getDate();
+		$now      = $date->toSql();
 
-		$state     = array();
+		$state = array();
 
 		if ($sContent)
 		{

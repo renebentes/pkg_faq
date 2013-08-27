@@ -70,10 +70,10 @@ class FaqModelFaqs extends JModelList
 	protected function populateState($ordering = null, $direction = null)
 	{
 		// Initialise variables.
-		$app = JFactory::getApplication('administrator');
+		$app = JFactory::getApplication();
 
 		// Adjust the context to support modal layouts.
-		if ($layout = JRequest::getVar('layout'))
+		if ($layout = $app->input->get('layout'))
 		{
 			$this->context .= '.' . $layout;
 		}
@@ -82,14 +82,20 @@ class FaqModelFaqs extends JModelList
 		$search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
 		$this->setState('filter.search', $search);
 
-		$accessId = $this->getUserStateFromRequest($this->context . '.filter.access', 'filter_access', null, 'int');
-		$this->setState('filter.access', $accessId);
+		$access = $this->getUserStateFromRequest($this->context . '.filter.access', 'filter_access', null, 'int');
+		$this->setState('filter.access', $access);
+
+		$authorId = $app->getUserStateFromRequest($this->context . '.filter.author_id', 'filter_author_id');
+		$this->setState('filter.author_id', $authorId);
 
 		$published = $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', '', 'string');
 		$this->setState('filter.published', $published);
 
 		$categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id', '');
 		$this->setState('filter.category_id', $categoryId);
+
+		$level = $this->getUserStateFromRequest($this->context . '.filter.level', 'filter_level', 0, 'int');
+		$this->setState('filter.level', $level);
 
 		$language = $this->getUserStateFromRequest($this->context . '.filter.language', 'filter_language', '');
 		$this->setState('filter.language', $language);
@@ -122,6 +128,7 @@ class FaqModelFaqs extends JModelList
 		$id .= ':' . $this->getState('filter.access');
 		$id .= ':' . $this->getState('filter.published');
 		$id .= ':' . $this->getState('filter.category_id');
+		$id .= ':' . $this->getState('filter.author_id');
 		$id .= ':' . $this->getState('filter.language');
 
 		return parent::getStoreId($id);
@@ -140,15 +147,17 @@ class FaqModelFaqs extends JModelList
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 		$user  = JFactory::getUser();
+		$app = JFactory::getApplication();
 
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
 				'list.select',
-				'a.id, a.title, a.alias, a.catid, a.hits, ' .
+				'a.id, a.title, a.alias, a.catid, a.created, ' .
+				'a.created_by, a.created_by_alias, ' .
 				'a.published, a.access, a.ordering, a.language, '.
 				'a.checked_out, a.checked_out_time, a.publish_up, '.
-				'a.publish_down'
+				'a.publish_down, a.hits'
 			)
 		);
 		$query->from($db->quoteName('#__faq') . ' AS a');
@@ -198,17 +207,36 @@ class FaqModelFaqs extends JModelList
 		}
 
 		// Filter by a single or group of categories.
+		$baselevel = 1;
 		$categoryId = $this->getState('filter.category_id');
 		if (is_numeric($categoryId))
 		{
-			$query->where('a.catid = ' . (int) $categoryId);
+			$cat_tbl = JTable::getInstance('Category', 'JTable');
+			$cat_tbl->load($categoryId);
+			$rgt = $cat_tbl->rgt;
+			$lft = $cat_tbl->lft;
+			$baselevel = (int) $cat_tbl->level;
+			$query->where('c.lft >= ' . (int) $lft)
+				->where('c.rgt <= ' . (int) $rgt);
 		}
-		/*elseif (is_array($categoryId))
+		elseif (is_array($categoryId))
 		{
 			JArrayHelper::toInteger($categoryId);
 			$categoryId = implode(',', $categoryId);
 			$query->where('a.catid IN (' . $categoryId . ')');
-		}*/
+		}
+
+		// Filter on the level.
+		if ($level = $this->getState('filter.level'))
+		{
+			$query->where('c.level <= ' . ((int) $level + (int) $baselevel - 1));
+		}
+
+		$authorId = $this->getState('filter.author_id');
+		if (is_numeric($authorId))
+		{
+			$query->where('a.created_by = ' . (int) $authorId);
+		}
 
 		// Filter by search in title.
 		$search = $this->getState('filter.search');
@@ -220,7 +248,7 @@ class FaqModelFaqs extends JModelList
 			}
 			else
 			{
-				$search = $db->Quote('%' . $db->escape($search, true) . '%');
+				$search = $db->quote('%' . $db->escape($search, true) . '%');
 				$query->where('(a.title LIKE ' . $search . ' OR a.alias LIKE ' . $search . ')');
 			}
 		}
@@ -232,11 +260,20 @@ class FaqModelFaqs extends JModelList
 		}
 
 		// Add the list ordering clause.
-		$orderCol  = $this->state->get('list.ordering');
-		$orderDirn = $this->state->get('list.direction');
+		$orderCol  = $this->state->get('list.ordering', 'a.title');
+		$orderDirn = $this->state->get('list.direction', 'asc');
 		if ($orderCol == 'a.ordering' || $orderCol == 'category_title')
 		{
 			$orderCol = 'c.title ' . $orderDirn . ', a.ordering';
+		}
+		//sqlsrv change
+		if ($orderCol == 'language')
+		{
+			$orderCol = 'l.title';
+		}
+		if ($orderCol == 'access_level')
+		{
+			$orderCol = 'ag.title';
 		}
 		$query->order($db->escape($orderCol . ' ' . $orderDirn));
 

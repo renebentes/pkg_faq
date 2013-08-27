@@ -12,7 +12,7 @@ defined('_JEXEC') or die;
 // Access check.
 if (!JFactory::getUser()->authorise('core.manage', 'com_faq'))
 {
-	return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
+	return new Exception(JText::_('JERROR_ALERTNOAUTHOR'),  403);
 }
 
 require_once JPATH_COMPONENT . '/helpers/faq.php';

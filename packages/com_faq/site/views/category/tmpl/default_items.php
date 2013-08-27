@@ -15,8 +15,16 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 
 <script src="<?php echo JUri::root() . 'media/com_faq/js/faq.js' ?>" type="text/javascript"></script>
 
+<script type="text/javascript">
+(function($) {
+	$(function() {
+		$('.rating').rating({url: 'index.php?option=com_faq&task=faq.saveratingajax'});
+	});
+})(jQuery);
+</script>
+
 <?php if (empty($this->items) && $this->params->get('show_no_results', 1)) : ?>
-<p><?php echo JText::_('COM_FAQ_NO_RESULTS'); ?></p>
+<p><?php echo JText::_('COM_FAQ_NO_MATCHING_RESULTS'); ?></p>
 <?php else : ?>
 <div id="faq-items" class="accordion">
 	<?php
@@ -60,30 +68,30 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 
 			<?php if ($this->params->get('show_hits') or $this->params->get('show_rating')) : ?>
 				<ul class="unstyled pull-right">
+				<?php if ($this->params->get('show_rating')) : ?>
+					<li class="hasTooltip" rel="tooltip" data-original-title="<?php echo JText::_('COM_FAQ_FIELD_RATING'); ?>">
+						<ul class="inline">
+							<li class='rating'>
+								<span id="up<?php echo $item->id; ?>"><?php echo !empty($item->vote_up) ? $item->vote_up : 0; ?></span>
+								<a class="up-<?php echo $item->id; ?>" href="javascript:void(0);">
+									<b class="icon-thumbs-up"></b>
+								</a>
+							</li>
+							<li class="rating">
+								<span id="down<?php echo $item->id; ?>"><?php echo !empty($item->vote_down) ? $item->vote_down : 0; ?></span>
+								<a class="down-<?php echo $item->id; ?>" href="javascript:void(0);">
+									<b class="icon-thumbs-down"></b>
+								</a>
+							</li>
+						</ul>
+					</li>
+				<?php endif; ?>
 				<?php if ($this->params->get('show_hits')) : ?>
 					<li>
 						<i class="icon-eye-open"></i>
 						<span id="hits<?php echo $item->id; ?>">
 							<?php echo JText::sprintf('COM_FAQ_HITS', $item->hits); ?>
 						</span>
-					</li>
-				<?php endif; ?>
-				<?php if ($this->params->get('show_rating')) : ?>
-					<li class="hasTooltip" rel="tooltip" data-original-title="<?php echo JText::_('COM_FAQ_FIELD_RATING'); ?>">
-						<ul class="inline">
-							<li>
-								<span id="up<?php echo $item->id; ?>"><?php echo !empty($item->vote_up) ? $item->vote_up : 0; ?></span>
-								<a class="vote" href="#up<?php echo $item->id; ?>">
-									<b class="icon-thumbs-up"></b>
-								</a>
-							</li>
-							<li>
-								<span id="down<?php echo $item->id; ?>"><?php echo !empty($item->vote_down) ? $item->vote_down : 0; ?></span>
-								<a class="vote" href="#down<?php echo $item->id; ?>">
-									<b class="icon-thumbs-down"></b>
-								</a>
-							</li>
-						</ul>
 					</li>
 				<?php endif; ?>
 				</ul>

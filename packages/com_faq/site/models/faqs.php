@@ -70,23 +70,23 @@ class FaqModelFaqs extends JModelList
 	protected function populateState($ordering = 'ordering', $direction = 'ASC')
 	{
 		// Initialise variables.
-		$app    = JFactory::getApplication();
+		$app   = JFactory::getApplication();
 
 		// List state information
-		$value = JRequest::getUInt('limit', $app->getCfg('list_limit', 0));
+		$value = $app->input->getUInt('limit', $app->getCfg('list_limit', 0));
 		$this->setState('list.limit', $value);
 
-		$value = JRequest::getUInt('limitstart', 0);
+		$value = $app->input->getUInt('limitstart', 0);
 		$this->setState('list.start', $value);
 
-		$orderCol = JRequest::getCmd('filter_order', 'a.ordering');
+		$orderCol = $app->input->get('filter_order', 'a.ordering');
 		if (!in_array($orderCol, $this->filter_fields))
 		{
 			$orderCol = 'a.ordering';
 		}
 		$this->setState('list.ordering', $orderCol);
 
-		$listOrder = JRequest::getCmd('filter_order_Dir', 'ASC');
+		$listOrder = $app->input->get('filter_order_Dir', 'ASC');
 		if (!in_array(strtoupper($listOrder), array('ASC', 'DESC', '')))
 		{
 			$listOrder = 'ASC';
@@ -107,7 +107,7 @@ class FaqModelFaqs extends JModelList
 
 		$this->setState('filter.access', true);
 
-		$this->setState('layout', JRequest::getCmd('layout'));
+		$this->setState('layout', $app->input->get('layout'));
 	}
 
 	/**
@@ -128,9 +128,7 @@ class FaqModelFaqs extends JModelList
 		$id .= ':' . serialize($this->getState('filter.published'));
 		$id .= ':' . $this->getState('filter.access');
 		$id .= ':' . $this->getState('filter.faq_id');
-		$id .= ':' . $this->getState('filter.faq_id.include');
 		$id	.= ':' . serialize($this->getState('filter.category_id'));
-		$id .= ':' . $this->getState('filter.category_id.include');
 		$id .= ':' . $this->getState('filter.language');
 
 		return parent::getStoreId($id);
@@ -259,30 +257,13 @@ class FaqModelFaqs extends JModelList
 			$query->where($publishedWhere . ' IN (' . $published . ')');
 		}
 
-		// Filter by a single or group of faqs.
-		$faqId = $this->getState('filter.faq_id');
-		if (is_numeric($faqId))
-		{
-			$type = $this->getState('filter.faq_id.include', true) ? '= ' : '<> ';
-			$query->where('a.id ' . $type . (int) $faqId);
-		}
-		elseif (is_array($faqId))
-		{
-			JArrayHelper::toInteger($faqId);
-			$faqId = implode(',', $faqId);
-			$type = $this->getState('filter.faq_id.include', true) ? 'IN' : 'NOT IN';
-			$query->where('a.id ' . $type .' (' . $faqId .')');
-		}
-
 		// Filter by a single or group of categories
 		$categoryId = $this->getState('filter.category_id');
 		if (is_numeric($categoryId))
 		{
-			$type = $this->getState('filter.category_id.include', true) ? '= ' : '<> ';
-
 			// Add subcategory check
 			$includeSubcategories = $this->getState('filter.subcategories', false);
-			$categoryEquals = 'a.catid ' . $type . (int) $categoryId;
+			$categoryEquals = 'a.catid = ' . (int) $categoryId;
 
 			if ($includeSubcategories)
 			{
@@ -303,16 +284,6 @@ class FaqModelFaqs extends JModelList
 			else
 			{
 				$query->where($categoryEquals);
-			}
-		}
-		elseif (is_array($categoryId) && (count($categoryId) > 0))
-		{
-			JArrayHelper::toInteger($categoryId);
-			$categoryId = implode(',', $categoryId);
-			if (!empty($categoryId))
-			{
-				$type = $this->getState('filter.category_id.include', true) ? 'IN' : 'NOT IN';
-				$query->where('a.catid '. $type . ' (' . $categoryId . ')');
 			}
 		}
 
